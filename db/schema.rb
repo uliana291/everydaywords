@@ -1,0 +1,130 @@
+# encoding: UTF-8
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# Note that this schema.rb definition is the authoritative source for your
+# database schema. If you need to create the application database on another
+# system, you should be using db:schema:load, not running all the migrations
+# from scratch. The latter is a flawed and unsustainable approach (the more migrations
+# you'll amass, the slower it'll run and the greater likelihood for issues).
+#
+# It's strongly recommended that you check this file into your version control system.
+
+ActiveRecord::Schema.define(version: 20160513144849) do
+
+  create_table "context_text_translations", force: :cascade do |t|
+    t.integer "translation_id",  limit: 4
+    t.integer "context_text_id", limit: 4
+  end
+
+  add_index "context_text_translations", ["context_text_id"], name: "index_context_text_translations_on_context_text_id", using: :btree
+  add_index "context_text_translations", ["translation_id"], name: "index_context_text_translations_on_translation_id", using: :btree
+
+  create_table "context_texts", force: :cascade do |t|
+    t.string   "url",         limit: 255
+    t.string   "title",       limit: 255
+    t.text     "whole_text",  limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "language_id", limit: 4
+  end
+
+  add_index "context_texts", ["language_id"], name: "index_context_texts_on_language_id", using: :btree
+
+  create_table "language_context_texts", force: :cascade do |t|
+    t.integer "language_id",     limit: 4
+    t.integer "context_text_id", limit: 4
+  end
+
+  add_index "language_context_texts", ["context_text_id"], name: "index_language_context_texts_on_context_text_id", using: :btree
+  add_index "language_context_texts", ["language_id"], name: "index_language_context_texts_on_language_id", using: :btree
+
+  create_table "languages", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "languages_users", force: :cascade do |t|
+    t.integer "user_id",     limit: 4
+    t.integer "language_id", limit: 4
+  end
+
+  add_index "languages_users", ["language_id"], name: "index_languages_users_on_language_id", using: :btree
+  add_index "languages_users", ["user_id"], name: "index_languages_users_on_user_id", using: :btree
+
+  create_table "rest_access_tokens", force: :cascade do |t|
+    t.string   "value",      limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.integer  "user_id",    limit: 4
+  end
+
+  add_index "rest_access_tokens", ["user_id"], name: "index_rest_access_tokens_on_user_id", using: :btree
+
+  create_table "text_element_context_texts", force: :cascade do |t|
+    t.integer "text_element_id", limit: 4
+    t.integer "context_text_id", limit: 4
+  end
+
+  add_index "text_element_context_texts", ["context_text_id"], name: "index_text_element_context_texts_on_context_text_id", using: :btree
+  add_index "text_element_context_texts", ["text_element_id"], name: "index_text_element_context_texts_on_text_element_id", using: :btree
+
+  create_table "text_elements", force: :cascade do |t|
+    t.string   "value",          limit: 255
+    t.string   "part_of_speech", limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.integer  "language_id",    limit: 4
+  end
+
+  add_index "text_elements", ["language_id"], name: "index_text_elements_on_language_id", using: :btree
+
+  create_table "translations", force: :cascade do |t|
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.integer  "original_id",       limit: 4
+    t.integer  "translated_one_id", limit: 4
+  end
+
+  add_index "translations", ["original_id"], name: "index_translations_on_original_id", using: :btree
+  add_index "translations", ["translated_one_id"], name: "index_translations_on_translated_one_id", using: :btree
+
+  create_table "user_translations", force: :cascade do |t|
+    t.integer  "user_id",          limit: 4
+    t.integer  "translation_id",   limit: 4
+    t.string   "learning_stage",   limit: 255
+    t.datetime "next_training_at"
+    t.string   "training_history", limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "user_translations", ["translation_id"], name: "index_user_translations_on_translation_id", using: :btree
+  add_index "user_translations", ["user_id"], name: "index_user_translations_on_user_id", using: :btree
+
+  create_table "users", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "email",      limit: 255
+    t.string   "singed_via", limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_foreign_key "context_text_translations", "context_texts"
+  add_foreign_key "context_text_translations", "translations"
+  add_foreign_key "context_texts", "languages"
+  add_foreign_key "language_context_texts", "context_texts"
+  add_foreign_key "language_context_texts", "languages"
+  add_foreign_key "languages_users", "languages"
+  add_foreign_key "languages_users", "users"
+  add_foreign_key "rest_access_tokens", "users"
+  add_foreign_key "text_element_context_texts", "context_texts"
+  add_foreign_key "text_element_context_texts", "text_elements"
+  add_foreign_key "text_elements", "languages"
+  add_foreign_key "translations", "text_elements", column: "original_id"
+  add_foreign_key "translations", "text_elements", column: "translated_one_id"
+  add_foreign_key "user_translations", "translations"
+  add_foreign_key "user_translations", "users"
+end

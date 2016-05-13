@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  value: MyString
+  part_of_speech: MyString
+
+two:
+  value: MyString
+  part_of_speech: MyString

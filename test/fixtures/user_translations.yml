@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 
+  translation_id: 
+  learning_stage: MyString
+  next_training_at: 2016-05-13 17:19:03
+  training_history: MyString
+
+two:
+  user_id: 
+  translation_id: 
+  learning_stage: MyString
+  next_training_at: 2016-05-13 17:19:03
+  training_history: MyString
