@@ -1192,3 +1192,135 @@ Started PATCH "/api/language/3" for 127.0.0.1 at 2016-05-13 21:37:16 +0300
   [1m[35m (0.1ms)[0m  BEGIN
   [1m[36mSQL (2.7ms)[0m  [1mUPDATE `languages` SET `name` = 'Russian', `updated_at` = '2016-05-13 18:37:16' WHERE `languages`.`id` = 3[0m
   [1m[35m (5.4ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+Migrating to CreateTranslationInContextTexts (20160513200556)
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+Migrating to DropContextTextTranslation (20160513201047)
+  [1m[35m (20.3ms)[0m  DROP TABLE `context_text_translations`
+  [1m[36m (0.1ms)[0m  [1mBEGIN[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20160513201047')
+  [1m[36m (5.5ms)[0m  [1mCOMMIT[0m
+Migrating to CreateTranslationInContextTexts (20160513201556)
+  [1m[35m (49.6ms)[0m  CREATE TABLE `translation_in_context_texts` (`id` int(11) auto_increment PRIMARY KEY, `position` int(11), `selection_length` int(11), `translation_id` int(11), `context_text_id` int(11), `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL,  INDEX `index_translation_in_context_texts_on_translation_id`  (`translation_id`) ,  INDEX `index_translation_in_context_texts_on_context_text_id`  (`context_text_id`) ) ENGINE=InnoDB
+  [1m[36m (43.2ms)[0m  [1mALTER TABLE `translation_in_context_texts` ADD CONSTRAINT `fk_rails_daf7d6ae75`
+FOREIGN KEY (`translation_id`)
+  REFERENCES `translations` (`id`)
+[0m
+  [1m[35m (62.3ms)[0m  ALTER TABLE `translation_in_context_texts` ADD CONSTRAINT `fk_rails_957f790b79`
+FOREIGN KEY (`context_text_id`)
+  REFERENCES `context_texts` (`id`)
+
+  [1m[36m (0.1ms)[0m  [1mBEGIN[0m
+  [1m[35mSQL (0.1ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20160513201556')
+  [1m[36m (5.1ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.1ms)[0m  SELECT `schema_migrations`.* FROM `schema_migrations`
+  [1m[36m (0.2ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'context_texts'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `context_texts`
+  [1m[36m (0.2ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'language_context_texts'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `language_context_texts`
+  [1m[36m (0.2ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'languages'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `languages`
+  [1m[36m (0.2ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'languages_users'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `languages_users`
+  [1m[36m (0.3ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'rest_access_tokens'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `rest_access_tokens`
+  [1m[36m (0.2ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'text_element_context_texts'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `text_element_context_texts`
+  [1m[36m (0.2ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'text_elements'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `text_elements`
+  [1m[36m (0.3ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'translation_in_context_texts'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `translation_in_context_texts`
+  [1m[36m (0.3ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'translations'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `translations`
+  [1m[36m (0.2ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'user_translations'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `user_translations`
+  [1m[36m (0.2ms)[0m  [1mSELECT fk.referenced_table_name as 'to_table'
+      ,fk.referenced_column_name as 'primary_key'
+      ,fk.column_name as 'column'
+      ,fk.constraint_name as 'name'
+FROM information_schema.key_column_usage fk
+WHERE fk.referenced_column_name is not null
+  AND fk.table_schema = 'everydaywords'
+  AND fk.table_name = 'users'
+[0m
+  [1m[35m (0.1ms)[0m  SHOW CREATE TABLE `users`

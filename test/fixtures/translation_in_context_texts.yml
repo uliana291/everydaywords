@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  position: 
+  selection_length: 
+  translation_id: 
+  context_text_id: 
+
+two:
+  position: 
+  selection_length: 
+  translation_id: 
+  context_text_id: 

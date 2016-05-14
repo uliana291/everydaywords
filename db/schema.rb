@@ -11,15 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160513144849) do
-
-  create_table "context_text_translations", force: :cascade do |t|
-    t.integer "translation_id",  limit: 4
-    t.integer "context_text_id", limit: 4
-  end
-
-  add_index "context_text_translations", ["context_text_id"], name: "index_context_text_translations_on_context_text_id", using: :btree
-  add_index "context_text_translations", ["translation_id"], name: "index_context_text_translations_on_translation_id", using: :btree
+ActiveRecord::Schema.define(version: 20160513201556) do
 
   create_table "context_texts", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -81,6 +73,18 @@ ActiveRecord::Schema.define(version: 20160513144849) do
 
   add_index "text_elements", ["language_id"], name: "index_text_elements_on_language_id", using: :btree
 
+  create_table "translation_in_context_texts", force: :cascade do |t|
+    t.integer  "position",         limit: 4
+    t.integer  "selection_length", limit: 4
+    t.integer  "translation_id",   limit: 4
+    t.integer  "context_text_id",  limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "translation_in_context_texts", ["context_text_id"], name: "index_translation_in_context_texts_on_context_text_id", using: :btree
+  add_index "translation_in_context_texts", ["translation_id"], name: "index_translation_in_context_texts_on_translation_id", using: :btree
+
   create_table "translations", force: :cascade do |t|
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
@@ -112,8 +116,6 @@ ActiveRecord::Schema.define(version: 20160513144849) do
     t.datetime "updated_at",             null: false
   end
 
-  add_foreign_key "context_text_translations", "context_texts"
-  add_foreign_key "context_text_translations", "translations"
   add_foreign_key "context_texts", "languages"
   add_foreign_key "language_context_texts", "context_texts"
   add_foreign_key "language_context_texts", "languages"
@@ -123,6 +125,8 @@ ActiveRecord::Schema.define(version: 20160513144849) do
   add_foreign_key "text_element_context_texts", "context_texts"
   add_foreign_key "text_element_context_texts", "text_elements"
   add_foreign_key "text_elements", "languages"
+  add_foreign_key "translation_in_context_texts", "context_texts"
+  add_foreign_key "translation_in_context_texts", "translations"
   add_foreign_key "translations", "text_elements", column: "original_id"
   add_foreign_key "translations", "text_elements", column: "translated_one_id"
   add_foreign_key "user_translations", "translations"
