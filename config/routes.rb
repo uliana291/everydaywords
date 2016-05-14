@@ -1,18 +1,19 @@
 Rails.application.routes.draw do
+
+  root 'welcome#index'
+
   resources :benchmarks, only: :none do
     collection do
       get :simple
     end
   end
 
-  get '/api/language/list', to: 'language#list'
-  get '/api/language/:id', to: 'language#show'
-
-  match '/api/language', to: 'language#create', via: [:post]
-
-  match '/api/language/:id', to: 'language#delete', via: [:delete]
-
-  match '/api/language/:id', to: 'language#update', via: [:patch]
+  scope '/api' do
+    get '/language/list', to: 'language#list'
+    resources :language, only: [ :show, :create, :destroy, :update]
+    get '/context_text/list', to: 'context_text#list'
+    resources :context_text, only: [ :create, :show, :update, :destroy]
+  end
 
   get '/404' => 'errors#not_found'
   get '/500' => 'errors#exception'

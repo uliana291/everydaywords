@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160513201556) do
+ActiveRecord::Schema.define(version: 20160514075956) do
 
   create_table "context_texts", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -116,6 +116,14 @@ ActiveRecord::Schema.define(version: 20160513201556) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "users_context_texts", force: :cascade do |t|
+    t.integer "context_text_id", limit: 4
+    t.integer "user_id",         limit: 4
+  end
+
+  add_index "users_context_texts", ["context_text_id"], name: "index_users_context_texts_on_context_text_id", using: :btree
+  add_index "users_context_texts", ["user_id"], name: "index_users_context_texts_on_user_id", using: :btree
+
   add_foreign_key "context_texts", "languages"
   add_foreign_key "language_context_texts", "context_texts"
   add_foreign_key "language_context_texts", "languages"
@@ -131,4 +139,6 @@ ActiveRecord::Schema.define(version: 20160513201556) do
   add_foreign_key "translations", "text_elements", column: "translated_one_id"
   add_foreign_key "user_translations", "translations"
   add_foreign_key "user_translations", "users"
+  add_foreign_key "users_context_texts", "context_texts"
+  add_foreign_key "users_context_texts", "users"
 end

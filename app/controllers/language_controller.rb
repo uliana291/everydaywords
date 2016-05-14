@@ -23,12 +23,12 @@ class LanguageController < ApiController
     end
   end
 
-  def delete
+  def destroy
     language = Language.find_by(id: params[:id])
     if !language
       render :json => {:error => 'not-found'}.to_json, :status => 404
     else
-      language.destroy!
+      language.destroy
       language = Language.find_by(id: params[:id])
       if !language
         render :json => {:status => 'ok'}.to_json, :status => 200
