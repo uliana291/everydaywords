@@ -6,7 +6,6 @@ class ContextTextController < ApiController
   end
 
   def create
-    render :json => {:error => 'wow is not found'}.to_json, :status => 404
     if Language.find_by(id: params[:language_id])
       context_text = ContextText.create(context_params)
       if !context_text

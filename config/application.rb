@@ -30,5 +30,6 @@ module Everydaywords
     config.middleware.delete ActionDispatch::Flash
 
     config.exceptions_app = self.routes
+    config.static_cache_control = "no-cache, no-store, max-age=0, must-revalidate"
   end
 end
