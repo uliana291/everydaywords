@@ -1,0 +1,5 @@
+<% ['facebook', 'google_oauth2'].each do |provider| %>
+
+        <%= link_to "Sign in with #{provider.to_s.titleize}", omniauth_authorize_path('user', provider) %>
+
+<% end %>

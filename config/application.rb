@@ -26,10 +26,16 @@ module Everydaywords
     config.middleware.delete Rack::Sendfile
     config.middleware.delete Rack::MethodOverride
     config.middleware.delete ActionDispatch::Cookies
-    config.middleware.delete ActionDispatch::Session::CookieStore
+   # config.middleware.delete ActionDispatch::Session::CookieStore
     config.middleware.delete ActionDispatch::Flash
 
     config.exceptions_app = self.routes
     config.static_cache_control = "no-cache, no-store, max-age=0, must-revalidate"
+
+    social_keys = File.join(Rails.root, 'config', 'social_keys.yml')
+    CONFIG = HashWithIndifferentAccess.new(YAML::load(IO.read(social_keys)))[Rails.env]
+    CONFIG.each do |k,v|
+      ENV[k.upcase] ||= v
+    end
   end
 end

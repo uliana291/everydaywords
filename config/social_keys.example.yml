@@ -1,0 +1,13 @@
+development:
+  facebook_key: "your key"
+  facebook_secret: "your key"
+
+  google_key: "your key"
+  google_secret: "your key"
+
+production:
+  facebook_key: "your key"
+  facebook_secret: "your key"
+
+  google_key: "your key"
+  google_secret: "your key"
