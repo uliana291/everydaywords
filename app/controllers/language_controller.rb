@@ -2,7 +2,7 @@ class LanguageController < ApiController
 
   def list
     languages = Language.all
-    render(json: Oj.dump(languages))
+    render(json: languages)
   end
 
   def show
@@ -10,7 +10,7 @@ class LanguageController < ApiController
     if !language
       render :json => {:error => 'not-found'}.to_json, :status => 404
     else
-      render(json: Oj.dump(language))
+      render(json: language)
     end
   end
 
@@ -19,7 +19,7 @@ class LanguageController < ApiController
     if !language
       render :json => {:error => 'internal-server-error'}.to_json, :status => 500
     else
-      render(json: Oj.dump(language))
+      render(json: language)
     end
   end
 
@@ -45,7 +45,7 @@ class LanguageController < ApiController
     else
       language.name = params[:name]
       if language.save
-        render(json: Oj.dump(language))
+        render(json: language)
       else
         render :json => {:error => 'internal-server-error'}.to_json, :status => 500
       end

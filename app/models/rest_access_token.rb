@@ -12,7 +12,7 @@ class RestAccessToken < ActiveRecord::Base
   def fetch_details_from_facebook
     graph = Koala::Facebook::API.new(self.token)
     facebook_data = graph.get_object("me")
-    self.username = facebook_data['username']
+    self.value = facebook_data['username']
     self.save
   end
 

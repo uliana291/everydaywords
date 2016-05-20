@@ -21,15 +21,17 @@ module Everydaywords
     # config.i18n.default_locale = :de
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
 
-    config.middleware.delete Rack::Sendfile
-    config.middleware.delete Rack::MethodOverride
-    config.middleware.delete ActionDispatch::Cookies
-   # config.middleware.delete ActionDispatch::Session::CookieStore
-    config.middleware.delete ActionDispatch::Flash
+   #  config.active_record.raise_in_transactional_callbacks = true
+   #
+   #  config.middleware.delete Rack::Sendfile
+   #  config.middleware.delete Rack::MethodOverride
+   #  #config.middleware.delete ActionDispatch::Cookies
+   # # config.middleware.delete ActionDispatch::Session::CookieStore
+   #  config.middleware.delete ActionDispatch::Flash
+   #
+   #  config.exceptions_app = self.routes
 
-    config.exceptions_app = self.routes
     config.static_cache_control = "no-cache, no-store, max-age=0, must-revalidate"
 
     social_keys = File.join(Rails.root, 'config', 'social_keys.yml')

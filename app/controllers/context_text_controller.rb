@@ -2,7 +2,13 @@ class ContextTextController < ApiController
 
   def list
     context_texts = ContextText.all
-    render(json: Oj.dump(context_texts))
+    render(json: context_texts)
+  end
+
+
+  def list_user
+    context_texts = current_user.context_texts
+    render(json: context_texts)
   end
 
   def create
@@ -11,6 +17,7 @@ class ContextTextController < ApiController
       if !context_text
         render :json => {:error => 'internal-server-error'}.to_json, :status => 500
       else
+        current_user.context_texts<<context_text
         render :json => {:result => { 'id' => context_text.id } }.to_json, :status => 200
       end
     else
@@ -51,7 +58,7 @@ class ContextTextController < ApiController
     if !context_text
       render :json => {:error => 'not-found'}.to_json, :status => 404
     else
-      render(json: Oj.dump(context_text))
+      render(json: context_text)
     end
   end
 

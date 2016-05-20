@@ -54,3 +54,6 @@ build-iPhoneSimulator/
 /.idea/
 
 
+config/database.yml
+config/social_keys.yml
+
