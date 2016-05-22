@@ -8,7 +8,7 @@ class LanguageController < ApiController
   def show
     language = Language.find_by(id: params[:id])
     if !language
-      render :json => {:error => 'not-found'}.to_json, :status => 404
+      render :json => {:error => 'not-found'}.to_json, :status => 500
     else
       render(json: language)
     end
@@ -26,7 +26,7 @@ class LanguageController < ApiController
   def destroy
     language = Language.find_by(id: params[:id])
     if !language
-      render :json => {:error => 'not-found'}.to_json, :status => 404
+      render :json => {:error => 'not-found'}.to_json, :status => 500
     else
       language.destroy
       language = Language.find_by(id: params[:id])
@@ -41,7 +41,7 @@ class LanguageController < ApiController
   def update
     language = Language.find_by(id: params[:id])
     if !language
-      render :json => {:error => 'not-found'}.to_json, :status => 404
+      render :json => {:error => 'not-found'}.to_json, :status => 500
     else
       language.name = params[:name]
       if language.save

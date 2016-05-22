@@ -4,8 +4,7 @@ class TranslationController < ApiController
   def list_user
     fullTranslation = []
     uTranslations = current_user.translations
-    uTranslations.each do |uT|
-      t = Translation.find_by(id: uT.translation_id).first
+    uTranslations.each do |t|
       elOriginal = TextElement.find_by(id: t.original_id).first
       elTranslation = TextElement.find_by(id: t.translated_one_id).first
       uContextTexts = current_user.context_texts.pluck(:context_text_id)
@@ -55,10 +54,10 @@ class TranslationController < ApiController
           render :json => {:error => 'internal-server-error'}.to_json, :status => 500
         end
       else
-        render :json => {:error => 'context text is not found'}.to_json, :status => 404
+        render :json => {:error => 'context text is not found'}.to_json, :status => 500
       end
     else
-      render :json => {:error => 'language is not found'}.to_json, :status => 404
+      render :json => {:error => 'language is not found'}.to_json, :status => 500
     end
 
   end
