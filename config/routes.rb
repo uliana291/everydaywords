@@ -16,6 +16,7 @@ Rails.application.routes.draw do
     resources :language, only: [ :show, :create, :destroy, :update]
     get '/context_text/list', to: 'context_text#list'
     get '/context_text/list/user', to: 'context_text#list_user'
+    get '/translation/list/user', to: 'translation#list_user'
     resources :context_text, only: [ :create, :show, :update, :destroy]
     match '/add_translation', to: 'translation#add', via: :post
     get '/user/current', to: 'user_api#current'
