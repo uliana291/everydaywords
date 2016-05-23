@@ -44,21 +44,21 @@ class TranslationController < ApiController
             if tContextText
               current_user.translations<<t
               render :json => {:result => { 'text_element_from_id' => elOriginal.id,
-                                            'text_element_to_id' => elTranslation.id } }.to_json, :status => 200
+                                            'text_element_to_id' => elTranslation.id } }, :status => 200
             else
-              render :json => {:error => 'internal-server-error'}.to_json, :status => 500
+              render :json => {:error => 'internal-server-error'}, :status => 500
             end
           else
-            render :json => {:error => 'internal-server-error'}.to_json, :status => 500
+            render :json => {:error => 'internal-server-error'}, :status => 500
           end
         else
-          render :json => {:error => 'internal-server-error'}.to_json, :status => 500
+          render :json => {:error => 'internal-server-error'}, :status => 500
         end
       else
-        render :json => {:error => 'context text is not found'}.to_json, :status => 500
+        render :json => {:error => 'context text is not found'}, :status => 500
       end
     else
-      render :json => {:error => 'language is not found'}.to_json, :status => 500
+      render :json => {:error => 'language is not found'}, :status => 500
     end
 
   end
