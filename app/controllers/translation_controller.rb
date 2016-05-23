@@ -5,10 +5,10 @@ class TranslationController < ApiController
     fullTranslation = []
     uTranslations = current_user.translations
     uTranslations.each do |t|
-      elOriginal = TextElement.find_by(id: t.original_id).first
-      elTranslation = TextElement.find_by(id: t.translated_one_id).first
+      elOriginal = TextElement.find_by(id: t.original_id)
+      elTranslation = TextElement.find_by(id: t.translated_one_id)
       uContextTexts = current_user.context_texts.pluck(:context_text_id)
-      trContextText = TranslationInContextText.find_by(translationd_id: t.id).where(context_text_id: uContextTexts)
+      trContextText = TranslationInContextText.where(translationd_id: t.id).where(context_text_id: uContextTexts)
       trContextText.each do |tr|
         fullTranslation << ['lang_from_id' => elOriginal.language_id,
                            'lang_to_id' => elTranslation.language_id,
