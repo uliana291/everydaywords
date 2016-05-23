@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160518160733) do
+ActiveRecord::Schema.define(version: 20160523194817) do
 
   create_table "context_texts", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -20,9 +20,12 @@ ActiveRecord::Schema.define(version: 20160518160733) do
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
     t.integer  "language_id", limit: 4
+    t.integer  "user_id",     limit: 4
+    t.boolean  "is_public"
   end
 
   add_index "context_texts", ["language_id"], name: "index_context_texts_on_language_id", using: :btree
+  add_index "context_texts", ["user_id"], name: "index_context_texts_on_user_id", using: :btree
 
   create_table "language_context_texts", force: :cascade do |t|
     t.integer "language_id",     limit: 4
@@ -84,10 +87,12 @@ ActiveRecord::Schema.define(version: 20160518160733) do
     t.integer  "context_text_id",  limit: 4
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
+    t.integer  "user_id",          limit: 4
   end
 
   add_index "translation_in_context_texts", ["context_text_id"], name: "index_translation_in_context_texts_on_context_text_id", using: :btree
   add_index "translation_in_context_texts", ["translation_id"], name: "index_translation_in_context_texts_on_translation_id", using: :btree
+  add_index "translation_in_context_texts", ["user_id"], name: "index_translation_in_context_texts_on_user_id", using: :btree
 
   create_table "translations", force: :cascade do |t|
     t.datetime "created_at",                  null: false
@@ -138,15 +143,8 @@ ActiveRecord::Schema.define(version: 20160518160733) do
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
-  create_table "users_context_texts", force: :cascade do |t|
-    t.integer "context_text_id", limit: 4
-    t.integer "user_id",         limit: 4
-  end
-
-  add_index "users_context_texts", ["context_text_id"], name: "index_users_context_texts_on_context_text_id", using: :btree
-  add_index "users_context_texts", ["user_id"], name: "index_users_context_texts_on_user_id", using: :btree
-
   add_foreign_key "context_texts", "languages"
+  add_foreign_key "context_texts", "users"
   add_foreign_key "language_context_texts", "context_texts"
   add_foreign_key "language_context_texts", "languages"
   add_foreign_key "languages_users", "languages"
@@ -157,10 +155,9 @@ ActiveRecord::Schema.define(version: 20160518160733) do
   add_foreign_key "text_elements", "languages"
   add_foreign_key "translation_in_context_texts", "context_texts"
   add_foreign_key "translation_in_context_texts", "translations"
+  add_foreign_key "translation_in_context_texts", "users"
   add_foreign_key "translations", "text_elements", column: "original_id"
   add_foreign_key "translations", "text_elements", column: "translated_one_id"
   add_foreign_key "user_translations", "translations"
   add_foreign_key "user_translations", "users"
-  add_foreign_key "users_context_texts", "context_texts"
-  add_foreign_key "users_context_texts", "users"
 end

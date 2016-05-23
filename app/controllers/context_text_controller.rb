@@ -11,6 +11,12 @@ class ContextTextController < ApiController
     render(json: context_texts)
   end
 
+  def url_list
+    ur = params[:url]
+    context_texts = ContextText.where(:url => ur)
+    render(json: context_texts)
+  end
+
   def create
     if Language.find_by(id: params[:language_id])
       context_text = ContextText.create(context_params)
@@ -65,7 +71,7 @@ class ContextTextController < ApiController
   private
   def context_params
     params.permit(:url, :title, :whole_text,
-                                 :language_id)
+                  :language_id, :is_public)
   end
 
 end

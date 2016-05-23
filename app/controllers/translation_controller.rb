@@ -39,7 +39,8 @@ class TranslationController < ApiController
             tContextText = TranslationInContextText.create(position: params[:position],
                                                            selection_length: params[:selection_length],
                                                            translation_id: t.id,
-                                                           context_text_id: params[:context_text_id])
+                                                           context_text_id: params[:context_text_id],
+                                                           user_id: current_user.id)
             if tContextText
               current_user.translations<<t
               render :json => {:result => { 'text_element_from_id' => elOriginal.id,
