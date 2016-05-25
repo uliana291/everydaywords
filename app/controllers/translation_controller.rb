@@ -10,14 +10,14 @@ class TranslationController < ApiController
       uContextTexts = current_user.context_texts.pluck(:id)
       trContextText = TranslationInContextText.where(translation_id: t.id).where(context_text_id: uContextTexts)
       trContextText.each do |tr|
-        fullTranslation << ['lang_from_id' => elOriginal.language_id,
+        fullTranslation.push('lang_from_id' => elOriginal.language_id,
                            'lang_to_id' => elTranslation.language_id,
                            'original' => elOriginal.value,
                            'translated_one' => elTranslation.value,
                            'part_of_speech' => elOriginal.part_of_speech,
                            'context_text_id' => tr.context_text_id,
                            'position' => tr.position,
-                           'selection_length' => tr.selection_length]
+                           'selection_length' => tr.selection_length)
       end
     end
     render(json: fullTranslation)
