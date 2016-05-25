@@ -7,8 +7,8 @@ class TranslationController < ApiController
     uTranslations.each do |t|
       elOriginal = TextElement.find_by(id: t.original_id)
       elTranslation = TextElement.find_by(id: t.translated_one_id)
-      uContextTexts = current_user.context_texts.pluck(:id)
-      trContextText = TranslationInContextText.where(translation_id: t.id).where(context_text_id: uContextTexts)
+#      uContextTexts = current_user.context_texts.pluck(:id)
+      trContextText = TranslationInContextText.where(translation_id: t.id).where(context_text_id: params[:context_text_id])
       trContextText.each do |tr|
         fullTranslation.push('lang_from_id' => elOriginal.language_id,
                            'lang_to_id' => elTranslation.language_id,
