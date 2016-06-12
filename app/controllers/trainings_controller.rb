@@ -1,0 +1,4 @@
+class TrainingsController < ApiController
+
+
+end
