@@ -19,6 +19,16 @@ class TranslationController < ApiController
               contextTexts = [{'context_text_id' => trContextText.context_text_id,
                                'position' => trContextText.position,
                                'selection_length' => trContextText.selection_length}]
+              fullTranslation.push('lang_from_id' => elOriginal.language_id,
+                                   'lang_to_id' => elTranslation.language_id,
+                                   'original' => elOriginal.value,
+                                   'translated_one' => elTranslation.value,
+                                   'part_of_speech' => elOriginal.part_of_speech,
+                                   'user_translation_id' => uTranslation.id,
+                                   'learning_stage' => uTranslation.learning_stage,
+                                   'next_training_at' => uTranslation.next_training_at,
+                                   'training_history' => uTranslation.training_history,
+                                   'context_texts' => contextTexts)
             end
           else
             trContextText = TranslationInContextText.where(translation_id: t.id).where(user_id: current_user.id)
@@ -27,17 +37,17 @@ class TranslationController < ApiController
                                 'position' => tr.position,
                                 'selection_length' => tr.selection_length)
             end
+            fullTranslation.push('lang_from_id' => elOriginal.language_id,
+                                 'lang_to_id' => elTranslation.language_id,
+                                 'original' => elOriginal.value,
+                                 'translated_one' => elTranslation.value,
+                                 'part_of_speech' => elOriginal.part_of_speech,
+                                 'user_translation_id' => uTranslation.id,
+                                 'learning_stage' => uTranslation.learning_stage,
+                                 'next_training_at' => uTranslation.next_training_at,
+                                 'training_history' => uTranslation.training_history,
+                                 'context_texts' => contextTexts)
           end
-          fullTranslation.push('lang_from_id' => elOriginal.language_id,
-                               'lang_to_id' => elTranslation.language_id,
-                               'original' => elOriginal.value,
-                               'translated_one' => elTranslation.value,
-                               'part_of_speech' => elOriginal.part_of_speech,
-                               'user_translation_id' => uTranslation.id,
-                               'learning_stage' => uTranslation.learning_stage,
-                               'next_training_at' => uTranslation.next_training_at,
-                               'training_history' => uTranslation.training_history,
-                               'context_texts' => contextTexts)
         end
       end
     end
@@ -46,6 +56,8 @@ class TranslationController < ApiController
     end
     render(json: fullTranslation)
   end
+
+
 
   def add
     lOriginal = Language.find_by(id: params[:lang_from_id])
