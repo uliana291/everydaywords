@@ -2,58 +2,15 @@ class TranslationController < ApiController
 
 
   def list_user
-    fullTranslation = []
     uTranslations = current_user.user_translations
-    uTranslations.each do |uTranslation|
-      t = uTranslation.translation
-      elOriginal = TextElement.find_by(id: t.original_id)
-      elTranslation = TextElement.find_by(id: t.translated_one_id)
+    fullTranslation = translation_loop(uTranslations)
+    render(json: fullTranslation)
+  end
 
-      if !params[:lang_from_id] || params[:lang_from_id].to_i == elOriginal.language_id
-        if !params[:lang_to_id] || params[:lang_to_id].to_i == elTranslation.language_id
-#         uContextTexts = current_user.context_texts.pluck(:id)
-          contextTexts = []
-          if params[:context_text_id]
-            trContextText = TranslationInContextText.where(translation_id: t.id).where(user_id: current_user.id).where(context_text_id: params[:context_text_id]).first
-            if trContextText
-              contextTexts = [{'context_text_id' => trContextText.context_text_id,
-                               'position' => trContextText.position,
-                               'selection_length' => trContextText.selection_length}]
-              fullTranslation.push('lang_from_id' => elOriginal.language_id,
-                                   'lang_to_id' => elTranslation.language_id,
-                                   'original' => elOriginal.value,
-                                   'translated_one' => elTranslation.value,
-                                   'part_of_speech' => elOriginal.part_of_speech,
-                                   'user_translation_id' => uTranslation.id,
-                                   'learning_stage' => uTranslation.learning_stage,
-                                   'next_training_at' => uTranslation.next_training_at,
-                                   'training_history' => uTranslation.training_history,
-                                   'context_texts' => contextTexts)
-            end
-          else
-            trContextText = TranslationInContextText.where(translation_id: t.id).where(user_id: current_user.id)
-            trContextText.each do |tr|
-              contextTexts.push('context_text_id' => tr.context_text_id,
-                                'position' => tr.position,
-                                'selection_length' => tr.selection_length)
-            end
-            fullTranslation.push('lang_from_id' => elOriginal.language_id,
-                                 'lang_to_id' => elTranslation.language_id,
-                                 'original' => elOriginal.value,
-                                 'translated_one' => elTranslation.value,
-                                 'part_of_speech' => elOriginal.part_of_speech,
-                                 'user_translation_id' => uTranslation.id,
-                                 'learning_stage' => uTranslation.learning_stage,
-                                 'next_training_at' => uTranslation.next_training_at,
-                                 'training_history' => uTranslation.training_history,
-                                 'context_texts' => contextTexts)
-          end
-        end
-      end
-    end
-    if params[:count]
-      fullTranslation = fullTranslation.sample(params[:count].to_i)
-    end
+
+  def list_translations
+    uTranslations = current_user.user_translations.where('next_training_at<= ?', Date.today)
+    fullTranslation = translation_loop(uTranslations)
     render(json: fullTranslation)
   end
 
@@ -105,5 +62,65 @@ class TranslationController < ApiController
     end
 
   end
+
+  private
+
+
+  def translation_loop(uTranslations)
+    fullTranslation = []
+    uTranslations.each do |uTranslation|
+      t = uTranslation.translation
+      elOriginal = TextElement.find_by(id: t.original_id)
+      elTranslation = TextElement.find_by(id: t.translated_one_id)
+
+      if !params[:lang_from_id] || params[:lang_from_id].to_i == elOriginal.language_id
+        if !params[:lang_to_id] || params[:lang_to_id].to_i == elTranslation.language_id
+#         uContextTexts = current_user.context_texts.pluck(:id)
+          contextTexts = []
+          if params[:context_text_id]
+            trContextText = TranslationInContextText.where(translation_id: t.id).where(user_id: current_user.id).where(context_text_id: params[:context_text_id]).first
+            if trContextText
+              contextTexts = [{'context_text_id' => trContextText.context_text_id,
+                               'position' => trContextText.position,
+                               'selection_length' => trContextText.selection_length}]
+              fullTranslation.push('lang_from_id' => elOriginal.language_id,
+                                   'lang_to_id' => elTranslation.language_id,
+                                   'original' => elOriginal.value,
+                                   'translated_one' => elTranslation.value,
+                                   'part_of_speech' => elOriginal.part_of_speech,
+                                   'user_translation_id' => uTranslation.id,
+                                   'learning_stage' => uTranslation.learning_stage,
+                                   'next_training_at' => uTranslation.next_training_at,
+                                   'training_history' => uTranslation.training_history,
+                                   'context_texts' => contextTexts)
+            end
+          else
+            trContextText = TranslationInContextText.where(translation_id: t.id).where(user_id: current_user.id)
+            trContextText.each do |tr|
+              contextTexts.push('context_text_id' => tr.context_text_id,
+                                'position' => tr.position,
+                                'selection_length' => tr.selection_length)
+            end
+            fullTranslation.push('lang_from_id' => elOriginal.language_id,
+                                 'lang_to_id' => elTranslation.language_id,
+                                 'original' => elOriginal.value,
+                                 'translated_one' => elTranslation.value,
+                                 'part_of_speech' => elOriginal.part_of_speech,
+                                 'user_translation_id' => uTranslation.id,
+                                 'learning_stage' => uTranslation.learning_stage,
+                                 'next_training_at' => uTranslation.next_training_at,
+                                 'training_history' => uTranslation.training_history,
+                                 'context_texts' => contextTexts)
+          end
+        end
+      end
+    end
+    if params[:count]
+      fullTranslation = fullTranslation.sample(params[:count].to_i)
+    end
+    fullTranslation
+  end
+
+
 
 end
