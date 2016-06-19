@@ -1,5 +1,7 @@
 class TrainingsController < ApiController
 require 'json'
+
+
   def save
     uTranslation = UserTranslation.find(params[:user_translation_id])
     if uTranslation
@@ -87,11 +89,11 @@ require 'json'
     if !training
       render :json => {:error => 'training is not found'}, :status => 500
     else
-      trainingEl = [ 'id' => training.id,
+      trainingEl = { 'id' => training.id,
                      'state' => training.state,
                      'kind' => training.kind,
                      'user_id' => training.user_id,
-                     'json_data' => JSON.parse(training.json_data)]
+                     'json_data' => JSON.parse(training.json_data)}
       render :json => trainingEl
     end
   end
@@ -112,8 +114,21 @@ require 'json'
     end
   end
 
+  def finish_daily
+    training = Training.find_by(:id => params[:id])
+    if !training
+      render :json => {:error => 'training is not found'}, :status => 500
+    else
+      training.state = 'finished'
+      json_data = JSON.parse(training.json_data)
+      training_history = []
+      json_data[:training_history].each do |el|
+        training_history.push(el[:results])
+      end
 
 
+    end
+  end
 
 
 
