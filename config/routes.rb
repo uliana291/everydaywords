@@ -22,6 +22,10 @@ Rails.application.routes.draw do
     resources :context_text, only: [ :create, :show, :update, :destroy]
     match '/add_translation', to: 'translation#add', via: :post
     match '/trainings/post_result', to: 'trainings#save', via: :post
+    match '/trainings/daily', to: 'trainings#add', via: :post
+    get '/trainings/daily/list', to: 'trainings#list'
+    get '/trainings/daily/:id', to: 'trainings#get'
+    match '/trainings/daily/:id', to: 'trainings#update', via: :patch
     get '/user/current', to: 'user_api#current'
   end
 

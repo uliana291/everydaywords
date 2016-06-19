@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160612165437) do
+ActiveRecord::Schema.define(version: 20160618093429) do
 
   create_table "context_texts", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -79,6 +79,17 @@ ActiveRecord::Schema.define(version: 20160612165437) do
   end
 
   add_index "text_elements", ["language_id"], name: "index_text_elements_on_language_id", using: :btree
+
+  create_table "trainings", force: :cascade do |t|
+    t.string   "kind",       limit: 255
+    t.string   "state",      limit: 255
+    t.text     "json_data",  limit: 65535
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "trainings", ["user_id"], name: "index_trainings_on_user_id", using: :btree
 
   create_table "translation_in_context_texts", force: :cascade do |t|
     t.integer  "position",         limit: 4
@@ -153,6 +164,7 @@ ActiveRecord::Schema.define(version: 20160612165437) do
   add_foreign_key "text_element_context_texts", "context_texts"
   add_foreign_key "text_element_context_texts", "text_elements"
   add_foreign_key "text_elements", "languages"
+  add_foreign_key "trainings", "users"
   add_foreign_key "translation_in_context_texts", "context_texts"
   add_foreign_key "translation_in_context_texts", "translations"
   add_foreign_key "translation_in_context_texts", "users"
