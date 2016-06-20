@@ -110,7 +110,7 @@ require 'json'
         uTranslation = UserTranslation.find(translation)
         training_count = results.length
         training_passed = 0
-        result.each do |r|
+        results.each do |r|
           if r == 'passed'
             training_passed += 1
           end
