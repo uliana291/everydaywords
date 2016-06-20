@@ -97,14 +97,14 @@ require 'json'
       training.state = 'finished'
       json_data = JSON.parse(training.json_data)
       training_history = []
-      json_data[:training_history].each do |el|
-        training_history.push(el[:results])
+      json_data['training_history'].each do |el|
+        training_history.push(el['results'])
       end
       training_history.flatten!
       tId = {}
       training_history.each do |h|
-        tId[h[:user_translation_id]] ||= []
-        tId[h[:user_translation_id]] << h[:answer]
+        tId[h['user_translation_id']] ||= []
+        tId[h['user_translation_id']] << h['answer']
       end
       tId.each do |translation, results|
         uTranslation = UserTranslation.find(translation)
