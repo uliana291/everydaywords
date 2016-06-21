@@ -118,9 +118,9 @@ require 'json'
         percent = training_passed.to_f/training_count.to_f
         if percent == 1
           newStage = to_next_stage(uTranslation.learning_stage)
-        elsif percent < 0.8 && percent > 0.6
+        elsif percent < 0.8 && percent >= 0.6
           newStage = minus_level(uTranslation.learning_stage)
-        elsif percent == 0.5
+        elsif percent < 0.6 && percent >= 0.4
           newStage = minus_two(uTranslation.learning_stage)
         else
           newStage = '1'
