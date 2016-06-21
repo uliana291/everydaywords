@@ -136,7 +136,8 @@ require 'json'
         uTranslation.training_history = training_history.to_s
         uTranslation.next_training_at = (percent == 1? get_next_training_time(uTranslation.learning_stage) : (Date.today+1).to_s)
         uTranslation.save
-        if uTranslation.save
+        training.save
+        if uTranslation && training
           render :json => {:status => 'ok'}, :status => 200
         else
           render :json => {:error => 'internal-server-error'}, :status => 500
