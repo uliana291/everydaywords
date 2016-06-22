@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     get '/trainings/daily/:id/finish', to: 'trainings#finish_daily'
     match '/trainings/daily/:id', to: 'trainings#update', via: :patch
     get '/user/current', to: 'user_api#current'
+    get '/ping', to: 'api#ping'
   end
 
   get '/404' => 'errors#not_found'

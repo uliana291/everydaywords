@@ -1,9 +1,16 @@
 class ApiController < ActionController::Metal
   abstract!
+  require 'fileutils'
 
   include AbstractController::Callbacks
   include ActionController::RackDelegation
   include ActionController::StrongParameters
+
+  before_action :authorize_touch
+
+  def ping
+    render :json => {:result => { 'response' => 'pong' }}, :status => 200
+  end
 
   private
 
@@ -13,6 +20,13 @@ class ApiController < ActionController::Metal
     body = Oj.dump(options[:json], mode: :compat)
     self.headers['Content-Length'] = body.bytesize.to_s
     self.response_body = body
+  end
+
+  def authorize_touch
+    if current_user
+      
+      FileUtils.touch(Rails.root.join('tmp','last_activity').to_s)
+    end
   end
 
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
