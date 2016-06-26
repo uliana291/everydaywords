@@ -38,7 +38,7 @@ class TranslationController < ApiController
               d = Date.today
               uTranslation = current_user.user_translations.find_or_create_by(translation: t)
               uTranslation.update_attributes(learning_stage: '1', next_training_at: (d+1).to_s,
-                                             training_history: [{when: d.to_s, next_stage: '1'}].to_s)
+                                             training_history: [{when: d.to_s, next_stage: '1'}].to_json)
               if uTranslation
                 render :json => {:result => {'text_element_from_id' => elOriginal.id,
                                              'text_element_to_id' => elTranslation.id}}, :status => 200
