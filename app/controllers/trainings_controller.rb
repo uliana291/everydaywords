@@ -96,7 +96,6 @@ require 'json'
     else
       training.state = 'finished'
       json_data = JSON.parse(training.json_data)
-      training_history = []
       json_data['training_history'].each do |el|
         training_history.push(el['results'])
       end
@@ -128,21 +127,25 @@ require 'json'
           newStage = '1'
         end
         time = DateTime.now.to_s
-        training_history = [{'when' => time,
+        training_history = JSON.parse(uTranslation.training_history)
+        training_history.push([{'when' => time,
                              'previous_stage' => uTranslation.learning_stage,
                              'new_stage' => newStage,
-                             'training_state' => (newStage == 'passed'? 'passed' : 'dont_know')}]
+                             'training_state' => 'daily'} ])
+        json_data['training_results'] = [ { 'user_translation_id' => uTranslation.id,
+                                            'previous_learning_stage' => uTranslation.learning_stage,
+                                            'new_learning_stage' => newStage} ]
+        training.json_data = json_data.to_json
         uTranslation.learning_stage = newStage
-        uTranslation.training_history = training_history.to_s
+        uTranslation.training_history = training_history.to_json
         uTranslation.next_training_at = (percent == 1? get_next_training_time(uTranslation.learning_stage) : (Date.today+1).to_s)
         uTranslation.save
         training.save
-        if uTranslation && training
-          render :json => {:status => 'ok'}, :status => 200
-        else
+        if !uTranslation || !training
           render :json => {:error => 'internal-server-error'}, :status => 500
         end
       end
+      render :json => {:status => 'ok'}, :status => 200
     end
   end
 
