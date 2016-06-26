@@ -133,6 +133,7 @@ require 'json'
                              'previous_stage' => uTranslation.learning_stage,
                              'new_stage' => newStage,
                              'training_state' => 'daily'} ])
+        json_data['training_results'] = []
         json_data['training_results'].push([ { 'user_translation_id' => uTranslation.id,
                                             'previous_learning_stage' => uTranslation.learning_stage,
                                             'new_learning_stage' => newStage} ])
