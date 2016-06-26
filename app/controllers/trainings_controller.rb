@@ -95,6 +95,7 @@ require 'json'
       render :json => {:error => 'training is not found'}, :status => 500
     else
       training.state = 'finished'
+      training_history = []
       json_data = JSON.parse(training.json_data)
       json_data['training_history'].each do |el|
         training_history.push(el['results'])
