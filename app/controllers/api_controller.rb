@@ -24,8 +24,8 @@ class ApiController < ActionController::Metal
 
   def authorize_touch
     if current_user
-      
-      FileUtils.touch(Rails.root.join('tmp','last_activity').to_s)
+      ENV['LAST_ACTIVITY_FILE_PATH']
+      FileUtils.touch(ENV['LAST_ACTIVITY_FILE_PATH'])
     end
   end
 
