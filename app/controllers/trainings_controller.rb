@@ -45,6 +45,21 @@ class TrainingsController < ApiController
     end
   end
 
+  def destroy
+    training = Training.find_by(id: params[:id])
+    if !training
+      render :json => {:error => 'not-found'}, :status => 500
+    else
+      training.destroy
+      training = Training.find_by(id: params[:id])
+      if !training
+        render :json => {:status => 'ok'}, :status => 200
+      else
+        render :json => {:error => 'internal-server-error'}, :status => 500
+      end
+    end
+  end
+
 
   def list
     trainings = Training.where(:kind => 'daily', :user_id => current_user.id)
@@ -129,7 +144,7 @@ class TrainingsController < ApiController
           else
             newStage = '1'
           end
-          time = DateTime.now.to_s
+          time = DateTime .now.to_s
           training_history = JSON.parse(uTranslation.training_history)
           training_history.push([{'when' => time,
                                   'previous_stage' => uTranslation.learning_stage,

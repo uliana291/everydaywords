@@ -25,6 +25,7 @@ Rails.application.routes.draw do
     match '/trainings/daily', to: 'trainings#add', via: :post
     get '/trainings/daily/list', to: 'trainings#list'
     get '/trainings/daily/:id', to: 'trainings#get'
+    match '/trainings/daily/:id', to: 'trainings#destroy', via: :delete
     get '/trainings/daily/:id/finish', to: 'trainings#finish_daily'
     match '/trainings/daily/:id', to: 'trainings#update', via: :patch
     get '/user/current', to: 'user_api#current'
