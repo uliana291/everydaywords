@@ -24,7 +24,8 @@ class ApiController < ActionController::Metal
 
   def authorize_touch
     if current_user
-      FileUtils.touch('/home/juli/RubyMine_Projects/everydaywords/tmp/last_activity')
+      puts [ENV].to_json
+      FileUtils.touch(ENV['LAST_ACTIVITY_FILE_PATH'])
     end
   end
 

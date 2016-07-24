@@ -32,6 +32,9 @@ module Everydaywords
    #
    #  config.exceptions_app = self.routes
 
+    require "dotenv"
+    Dotenv.load(".env")
+
     config.static_cache_control = "no-cache, no-store, max-age=0, must-revalidate"
 
     social_keys = File.join(Rails.root, 'config', 'social_keys.yml')
