@@ -1,36 +1,6 @@
 class TrainingsController < ApiController
   require 'json'
 
-
-  def save
-    uTranslation = UserTranslation.find(params[:user_translation_id])
-    if uTranslation
-      currentStage = uTranslation.learning_stage
-      if params[:answer_result].eql? 'passed'
-        newStage = to_next_stage(currentStage)
-        uTranslation.learning_stage = newStage
-      else
-        newStage = '1'
-        uTranslation.learning_stage = '1'
-      end
-      time = DateTime.now.to_s
-      training_history = [{'when' => time,
-                           'previous_stage' => currentStage,
-                           'new_stage' => newStage,
-                           'training_state' => params[:answer_result]}]
-      uTranslation.next_training_at = get_next_training_time(newStage)
-      uTranslation.training_history = training_history.to_s
-      if uTranslation.save
-        render :json => {:status => 'ok'}, :status => 200
-      else
-        render :json => {:error => 'internal-server-error'}, :status => 500
-      end
-    else
-      render :json => {:error => 'user translation is not found'}, :status => 500
-    end
-  end
-
-
   def add
     training = Training.new
     training.kind = 'daily'
@@ -111,59 +81,65 @@ class TrainingsController < ApiController
       training.state = 'finished'
       training_history = []
       json_data = JSON.parse(training.json_data)
-      json_data['training_history'].each do |el|
-        training_history.push(el['results'])
-        lastTrainDate = (lastTrainDate.nil? ? el['when'].to_datetime : [lastTrainDate.to_datetime, el['when'].to_datetime].max)
-      end
-      if lastTrainDate
-        training_history.flatten!
-        tId = {}
-        training_history.each do |h|
-          tId[h['user_translation_id']] ||= []
-          tId[h['user_translation_id']] << h['answer']
+      lastTrainDate = nil
+      if json_data['training_history']
+        json_data['training_history'].each do |el|
+          training_history.push(el['results'])
+          lastTrainDate = (lastTrainDate.nil? ? el['when'].to_datetime : [lastTrainDate.to_datetime, el['when'].to_datetime].max)
+          puts lastTrainDate
         end
-        json_data['training_results'] = []
-        tId.each do |translation, results|
-          uTranslation = UserTranslation.find(translation)
-          training_count = results.length
-          training_passed = 0
-          results.each do |r|
-            if r == 'passed'
-              training_passed += 1
+        if lastTrainDate
+          training_history.flatten!
+          tId = {}
+          training_history.each do |h|
+            tId[h['user_translation_id']] ||= []
+            tId[h['user_translation_id']] << h['answer']
+          end
+          json_data['training_results'] = []
+          tId.each do |translation, results|
+            uTranslation = UserTranslation.find(translation)
+            training_count = results.length
+            training_passed = 0
+            results.each do |r|
+              if r == 'passed'
+                training_passed += 1
+              end
+            end
+            percent = training_passed.to_f/training_count.to_f
+            if percent == 1
+              newStage = to_next_stage(uTranslation.learning_stage)
+            elsif percent < 1 && percent >= 0.8
+              newStage = uTranslation.learning_stage
+            elsif percent < 0.8 && percent >= 0.6
+              newStage = minus_level(uTranslation.learning_stage)
+            elsif percent < 0.6 && percent >= 0.4
+              newStage = minus_two(uTranslation.learning_stage)
+            else
+              newStage = '1'
+            end
+            time = DateTime.now.to_s
+            training_history = JSON.parse(uTranslation.training_history)
+            training_history.push([{'when' => time,
+                                    'previous_stage' => uTranslation.learning_stage,
+                                    'new_stage' => newStage,
+                                    'training_state' => 'daily'}])
+            json_data['training_results'].push({'user_translation_id' => uTranslation.id,
+                                                 'previous_learning_stage' => uTranslation.learning_stage,
+                                                 'new_learning_stage' => newStage})
+            training.json_data = json_data.to_json
+            uTranslation.learning_stage = newStage
+            uTranslation.training_history = training_history.to_json
+            uTranslation.next_training_at = (percent == 1 ? get_next_training_time(uTranslation.learning_stage, lastTrainDate) : (lastTrainDate+1).to_s)
+            uTranslation.save
+            training.save
+            if !uTranslation || !training
+              render :json => {:error => 'internal-server-error'}, :status => 500
             end
           end
-          percent = training_passed.to_f/training_count.to_f
-          if percent == 1
-            newStage = to_next_stage(uTranslation.learning_stage)
-          elsif percent < 1 && percent >= 0.8
-            newStage = uTranslation.learning_stage
-          elsif percent < 0.8 && percent >= 0.6
-            newStage = minus_level(uTranslation.learning_stage)
-          elsif percent < 0.6 && percent >= 0.4
-            newStage = minus_two(uTranslation.learning_stage)
-          else
-            newStage = '1'
-          end
-          time = DateTime .now.to_s
-          training_history = JSON.parse(uTranslation.training_history)
-          training_history.push([{'when' => time,
-                                  'previous_stage' => uTranslation.learning_stage,
-                                  'new_stage' => newStage,
-                                  'training_state' => 'daily'}])
-          json_data['training_results'].push([{'user_translation_id' => uTranslation.id,
-                                               'previous_learning_stage' => uTranslation.learning_stage,
-                                               'new_learning_stage' => newStage}])
-          training.json_data = json_data.to_json
-          uTranslation.learning_stage = newStage
-          uTranslation.training_history = training_history.to_json
-          uTranslation.next_training_at = (percent == 1 ? get_next_training_time(uTranslation.learning_stage, lastTrainDate) : (lastTrainDate+1).to_s)
-          uTranslation.save
-          training.save
-          if !uTranslation || !training
-            render :json => {:error => 'internal-server-error'}, :status => 500
-          end
+          render :json => {:status => 'ok'}, :status => 200
+        else
+          render :json => {:error => 'internal-server-error'}, :status => 500
         end
-        render :json => {:status => 'ok'}, :status => 200
       else
         render :json => {:error => 'internal-server-error'}, :status => 500
       end

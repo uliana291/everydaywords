@@ -21,7 +21,6 @@ Rails.application.routes.draw do
     get '/trainings/get', to: 'translation#list_translations'
     resources :context_text, only: [ :create, :show, :update, :destroy]
     match '/add_translation', to: 'translation#add', via: :post
-    match '/trainings/post_result', to: 'trainings#save', via: :post
     match '/trainings/daily', to: 'trainings#add', via: :post
     get '/trainings/daily/list', to: 'trainings#list'
     get '/trainings/daily/:id', to: 'trainings#get'
