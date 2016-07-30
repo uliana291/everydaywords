@@ -204,7 +204,7 @@ class TrainingsController < ApiController
       when '30'
         newNextTraining = (date+30).to_s
       when 'finished'
-        newNextTraining = null
+        newNextTraining = nil
     end
     newNextTraining
   end

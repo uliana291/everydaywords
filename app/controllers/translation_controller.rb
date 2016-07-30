@@ -15,6 +15,21 @@ class TranslationController < ApiController
   end
 
 
+  def destroy
+    uTranslation = UserTranslation.find(params[:id])
+    if !uTranslation
+      render :json => {:error => 'not-found'}, :status => 500
+    else
+      uTranslation.destroy
+      uTranslation = UserTranslation.find_by(id: params[:id])
+      if !uTranslation
+        render :json => {:status => 'ok'}, :status => 200
+      else
+        render :json => {:error => 'internal-server-error'}, :status => 500
+      end
+    end
+  end
+
 
   def add
     lOriginal = Language.find_by(id: params[:lang_from_id])
