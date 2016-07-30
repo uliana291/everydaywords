@@ -18,7 +18,7 @@ Rails.application.routes.draw do
     get '/context_text/list/user', to: 'context_text#list_user'
     get '/context_text/list_by_url', to: 'context_text#url_list'
     get '/translation/list/user', to: 'translation#list_user'
-    match '/translation/:id', to: 'translation#destroy', via: :destroy
+    match '/translation/:id', to: 'translation#destroy', via: :delete
     get '/trainings/get', to: 'translation#list_translations'
     resources :context_text, only: [ :create, :show, :update, :destroy]
     match '/add_translation', to: 'translation#add', via: :post
