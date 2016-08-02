@@ -6,8 +6,16 @@ class TrainingsController < ApiController
     training.kind = 'daily'
     training.state = 'new'
     training.user = current_user
-    training.json_data = params[:json_data].to_json
-    training.save
+    if params[:json_data]
+      training.json_data = params[:json_data].to_json
+      training.save
+    else
+      if !manual_json(training)
+        training = nil
+      else
+        training.save
+      end
+    end
     if !training
       render :json => {:error => 'internal-server-error'}, :status => 500
     else
@@ -32,7 +40,7 @@ class TrainingsController < ApiController
 
 
   def list
-    trainings = Training.where(:kind => 'daily', :user_id => current_user.id)
+    trainings = Training.where(:kind => 'daily', :user_id => current_user.id).sort_by(&:created_at).reverse
     trainingsArr = []
     trainings.each do |t|
       trainingsArr.push('id' => t.id,
@@ -209,5 +217,16 @@ class TrainingsController < ApiController
     newNextTraining
   end
 
+  def manual_json(training)
+    if current_user.day_words != nil
+      user_translations = current_user.user_translations.where('next_training_at<= ?', Date.today)
+                              .pluck(:id).sample(current_user.day_words)
+      json_data = {:name => 'new training '+Time.now.iso8601, :user_translation_id_list => user_translations}.to_json
+      training.json_data = json_data
+      training
+    else
+      nil
+    end
+  end
 
 end
