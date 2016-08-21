@@ -82,6 +82,98 @@ class TrainingsController < ApiController
   end
 
   def finish_daily
+    training = nil
+    uTranslations = []
+
+    begin
+      ActiveRecord::Base.transaction(isolation: :serializable) do
+        #all read here
+        training = Training.find_by(:id => params[:id])
+        if !training
+          raise 'training not found'
+        end
+        json_data = JSON.parse(training.json_data)
+        if !json_data['training_history']
+          raise 'training_history is empty'
+        end
+
+        if training.state == 'finished'
+          raise 'already finished'
+        end
+
+        training_history = []
+        lastTrainDate = nil
+        json_data['training_history'].each do |el|
+          training_history.push(el['results'])
+          lastTrainDate = (lastTrainDate.nil? ? el['when'].to_datetime : [lastTrainDate.to_datetime, el['when'].to_datetime].max)
+          puts lastTrainDate
+        end
+        if !lastTrainDate
+          raise 'lastTrainDate is nil'
+        end
+
+        training_history.flatten!
+        tId = {}
+        training_history.each do |h|
+          tId[h['user_translation_id']] ||= []
+          tId[h['user_translation_id']] << h['answer']
+        end
+        json_data['training_results'] = []
+        tId.each do |translation, results|
+          uTranslation = UserTranslation.find(translation)
+          uTranslations.push(uTranslation)
+          training_count = results.length
+          training_passed = 0
+          results.each do |r|
+            if r == 'passed'
+              training_passed += 1
+            end
+          end
+          percent = training_passed.to_f/training_count.to_f
+          if percent == 1
+            newStage = to_next_stage(uTranslation.learning_stage)
+          elsif percent < 1 && percent >= 0.8
+            newStage = uTranslation.learning_stage
+          elsif percent < 0.8 && percent >= 0.6
+            newStage = minus_level(uTranslation.learning_stage)
+          elsif percent < 0.6 && percent >= 0.4
+            newStage = minus_two(uTranslation.learning_stage)
+          else
+            newStage = '1'
+          end
+          time = DateTime.now.to_s
+          training_history = JSON.parse(uTranslation.training_history)
+          training_history.push([{'when' => time,
+                                  'previous_stage' => uTranslation.learning_stage,
+                                  'new_stage' => newStage,
+                                  'training_state' => 'daily'}])
+          json_data['training_results'].push({'user_translation_id' => uTranslation.id,
+                                              'previous_learning_stage' => uTranslation.learning_stage,
+                                              'new_learning_stage' => newStage})
+          training.json_data = json_data.to_json
+          uTranslation.learning_stage = newStage
+          uTranslation.training_history = training_history.to_json
+          uTranslation.next_training_at = (percent == 1 ? get_next_training_time(uTranslation.learning_stage, lastTrainDate) : (lastTrainDate+1).to_s)
+        end
+      end
+
+      ActiveRecord::Base.transaction(isolation: :serializable) do
+        #all write here
+        training.state = 'finished'
+        uTranslations.each do |uTranslation|
+          uTranslation.save!
+        end
+        training.save!
+      end
+
+    rescue => e # rescue for everything else
+      render :json => {:error => "internal-server-error: #{e.message}"}, :status => 500
+      return
+    end
+  end
+
+
+  def finish_daily_old
     training = Training.find_by(:id => params[:id])
     if !training
       render :json => {:error => 'training is not found'}, :status => 500
@@ -132,8 +224,8 @@ class TrainingsController < ApiController
                                     'new_stage' => newStage,
                                     'training_state' => 'daily'}])
             json_data['training_results'].push({'user_translation_id' => uTranslation.id,
-                                                 'previous_learning_stage' => uTranslation.learning_stage,
-                                                 'new_learning_stage' => newStage})
+                                                'previous_learning_stage' => uTranslation.learning_stage,
+                                                'new_learning_stage' => newStage})
             training.json_data = json_data.to_json
             uTranslation.learning_stage = newStage
             uTranslation.training_history = training_history.to_json
@@ -153,6 +245,7 @@ class TrainingsController < ApiController
       end
     end
   end
+
 
 
   private
