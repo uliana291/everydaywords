@@ -1,4 +1,5 @@
 class TrainingsController < ApiController
+  include TranslationHelper
   require 'json'
 
   def add
@@ -28,12 +29,17 @@ class TrainingsController < ApiController
     if !training
       render :json => {:error => 'not-found'}, :status => 500
     else
-      training.destroy
-      training = Training.find_by(id: params[:id])
-      if !training
-        render :json => {:status => 'ok'}, :status => 200
+      unfinished_words = search_for_unfinished_words
+      if unfinished_words.include?(training.id)
+        render :json => {:error => 'already training'}, :status => 500
       else
-        render :json => {:error => 'internal-server-error'}, :status => 500
+        training.destroy
+        training = Training.find_by(id: params[:id])
+        if !training
+          render :json => {:status => 'ok'}, :status => 200
+        else
+          render :json => {:error => 'internal-server-error'}, :status => 500
+        end
       end
     end
   end
@@ -132,8 +138,8 @@ class TrainingsController < ApiController
                                     'new_stage' => newStage,
                                     'training_state' => 'daily'}])
             json_data['training_results'].push({'user_translation_id' => uTranslation.id,
-                                                 'previous_learning_stage' => uTranslation.learning_stage,
-                                                 'new_learning_stage' => newStage})
+                                                'previous_learning_stage' => uTranslation.learning_stage,
+                                                'new_learning_stage' => newStage})
             training.json_data = json_data.to_json
             uTranslation.learning_stage = newStage
             uTranslation.training_history = training_history.to_json
@@ -228,19 +234,6 @@ class TrainingsController < ApiController
     else
       nil
     end
-  end
-
-
-  def search_for_unfinished_words
-    trainings = Training.where(state: 'new')
-    translation_ids = []
-    trainings.each do |training|
-      json_data = JSON.parse(training.json_data)
-      json_data['user_translation_id_list'].each do |id|
-        translation_ids.push(id)
-      end
-    end
-    return translation_ids.uniq
   end
 
 end

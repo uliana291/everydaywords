@@ -1,5 +1,5 @@
 class TranslationController < ApiController
-
+  include TranslationHelper
 
   def list_user
     uTranslations = current_user.user_translations
@@ -82,15 +82,16 @@ class TranslationController < ApiController
 
 
   def translation_loop(uTranslations)
-    fullTranslation = []
+    fullTranslations = []
+    unfinished_words = search_for_unfinished_words
     uTranslations.each do |uTranslation|
       t = uTranslation.translation
       elOriginal = TextElement.find_by(id: t.original_id)
       elTranslation = TextElement.find_by(id: t.translated_one_id)
+      already_training = unfinished_words.include?(uTranslation.id)
 
       if !params[:lang_from_id] || params[:lang_from_id].to_i == elOriginal.language_id
         if !params[:lang_to_id] || params[:lang_to_id].to_i == elTranslation.language_id
-#         uContextTexts = current_user.context_texts.pluck(:id)
           contextTexts = []
           if params[:context_text_id]
             trContextText = TranslationInContextText.where(translation_id: t.id).where(user_id: current_user.id).where(context_text_id: params[:context_text_id]).first
@@ -98,16 +99,6 @@ class TranslationController < ApiController
               contextTexts = [{'context_text_id' => trContextText.context_text_id,
                                'position' => trContextText.position,
                                'selection_length' => trContextText.selection_length}]
-              fullTranslation.push('lang_from_id' => elOriginal.language_id,
-                                   'lang_to_id' => elTranslation.language_id,
-                                   'original' => elOriginal.value,
-                                   'translated_one' => elTranslation.value,
-                                   'part_of_speech' => elOriginal.part_of_speech,
-                                   'user_translation_id' => uTranslation.id,
-                                   'learning_stage' => uTranslation.learning_stage,
-                                   'next_training_at' => uTranslation.next_training_at,
-                                   'training_history' => uTranslation.training_history,
-                                   'context_texts' => contextTexts)
             end
           else
             trContextText = TranslationInContextText.where(translation_id: t.id).where(user_id: current_user.id)
@@ -116,26 +107,26 @@ class TranslationController < ApiController
                                 'position' => tr.position,
                                 'selection_length' => tr.selection_length)
             end
-            fullTranslation.push('lang_from_id' => elOriginal.language_id,
-                                 'lang_to_id' => elTranslation.language_id,
-                                 'original' => elOriginal.value,
-                                 'translated_one' => elTranslation.value,
-                                 'part_of_speech' => elOriginal.part_of_speech,
-                                 'user_translation_id' => uTranslation.id,
-                                 'learning_stage' => uTranslation.learning_stage,
-                                 'next_training_at' => uTranslation.next_training_at,
-                                 'training_history' => uTranslation.training_history,
-                                 'context_texts' => contextTexts)
           end
+          fullTranslations.push('lang_from_id' => elOriginal.language_id,
+                               'lang_to_id' => elTranslation.language_id,
+                               'original' => elOriginal.value,
+                               'translated_one' => elTranslation.value,
+                               'part_of_speech' => elOriginal.part_of_speech,
+                               'user_translation_id' => uTranslation.id,
+                               'learning_stage' => uTranslation.learning_stage,
+                               'next_training_at' => uTranslation.next_training_at,
+                               'training_history' => uTranslation.training_history,
+                               'context_texts' => contextTexts,
+                               'already_training' => already_training)
         end
       end
     end
     if params[:count]
-      fullTranslation = fullTranslation.sample(params[:count].to_i)
+      fullTranslations = fullTranslations.sample(params[:count].to_i)
     end
-    fullTranslation
+    fullTranslations
   end
-
 
 
 end
