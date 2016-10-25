@@ -29,17 +29,12 @@ class TrainingsController < ApiController
     if !training
       render :json => {:error => 'not-found'}, :status => 500
     else
-      unfinished_words = search_for_unfinished_words
-      if unfinished_words.include?(training.id)
-        render :json => {:error => 'already training'}, :status => 500
+      training.destroy
+      training = Training.find_by(id: params[:id])
+      if !training
+        render :json => {:status => 'ok'}, :status => 200
       else
-        training.destroy
-        training = Training.find_by(id: params[:id])
-        if !training
-          render :json => {:status => 'ok'}, :status => 200
-        else
-          render :json => {:error => 'internal-server-error'}, :status => 500
-        end
+        render :json => {:error => 'internal-server-error'}, :status => 500
       end
     end
   end
