@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160730181928) do
+ActiveRecord::Schema.define(version: 20161106123520) do
 
   create_table "context_texts", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -36,9 +36,10 @@ ActiveRecord::Schema.define(version: 20160730181928) do
   add_index "language_context_texts", ["language_id"], name: "index_language_context_texts_on_language_id", using: :btree
 
   create_table "languages", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "name",        limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.string   "description", limit: 255
   end
 
   create_table "languages_users", force: :cascade do |t|
@@ -153,6 +154,7 @@ ActiveRecord::Schema.define(version: 20160730181928) do
     t.integer  "min_starts",             limit: 4
     t.integer  "day_words",              limit: 4
     t.text     "json_data",              limit: 65535
+    t.boolean  "admin"
   end
 
   add_index "users", ["authentication_token"], name: "index_users_on_authentication_token", unique: true, using: :btree

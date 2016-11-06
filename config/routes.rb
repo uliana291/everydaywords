@@ -30,7 +30,10 @@ Rails.application.routes.draw do
     match '/trainings/daily/:id', to: 'trainings#update', via: :patch
     get '/user/current', to: 'user#current'
     get '/ping', to: 'api#ping'
-    get '/user/profile', to: 'user#show'
+    get '/user/list', to: 'user#list'
+    get '/user/switch/:id', to: 'user#become'
+    get '/user/profile/', to: 'user#show'
+    get '/user/:id/profile', to: 'user#show'
     match '/user/profile', to: 'user#update', via: :patch
   end
 

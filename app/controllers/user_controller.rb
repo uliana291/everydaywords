@@ -4,17 +4,31 @@ class UserController < ApiController
     render(json: current_user)
   end
 
+  def list
+    if current_user.admin?
+      users = User.all
+      render(json: users)
+    end
+  end
+
+  def become
+    return unless current_user.admin?
+    sign_in(:user, User.find(params[:id]))
+    render(json: current_user)
+  end
+
   def show
     if !current_user
       render :json => {:error => 'not-found'}, :status => 500
     else
-      user = current_user.attributes
+      user = (params[:id]? User.find(params[:id]) : current_user)
+      user_attributes = user.attributes
       languages = []
-      current_user.languages.each do |l|
+      user.languages.each do |l|
        languages.push({:id => l.id})
       end
-      user[:languages] = languages
-      render :json => user
+      user_attributes[:languages] = languages
+      render :json => user_attributes
     end
   end
 
