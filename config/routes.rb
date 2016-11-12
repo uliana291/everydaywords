@@ -37,6 +37,12 @@ Rails.application.routes.draw do
     match '/user/profile', to: 'user#update', via: :patch
   end
 
+  get '/login' => 'welcome#index'
+  get '/translations/*other' => 'welcome#index'
+  get '/context_texts/*other' => 'welcome#index'
+  get '/trainings/*other' => 'welcome#index'
+  get '/user/*other' => 'welcome#index'
+
   get '/404' => 'errors#not_found'
   get '/500' => 'errors#exception'
 

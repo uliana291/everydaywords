@@ -1,6 +1,6 @@
 class WelcomeController < ApplicationController
   def index
-    render :file => 'public/index.html.erb'
+    render :file => 'public/index.html'
   end
 
   def user_current
