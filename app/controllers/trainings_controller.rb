@@ -223,7 +223,7 @@ class TrainingsController < ApiController
       unfinished_words = search_for_unfinished_words
       user_translations = current_user.user_translations.where('next_training_at<= ?', Date.today)
                               .where.not(id: unfinished_words).pluck(:id).sample(current_user.day_words)
-      json_data = {:name => 'new training '+Time.now.iso8601, :user_translation_id_list => user_translations}.to_json
+      json_data = {:name => Time.now.iso8601, :user_translation_id_list => user_translations}.to_json
       training.json_data = json_data
       training
     else
