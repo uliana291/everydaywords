@@ -12,7 +12,10 @@ Rails.application.routes.draw do
   end
 
   scope '/api' do
-
+    get '/context_text/list', to: 'context_text#list'
+    get '/context_text/list/user', to: 'context_text#list_user'
+    get '/context_text/list_by_url', to: 'context_text#url_list'
+    resources :context_text, only: [ :create, :show, :update, :destroy]
     scope '/user' do
       get '/list', to: 'user#list'
       get '/switch/:id', to: 'user#become'
@@ -20,13 +23,6 @@ Rails.application.routes.draw do
       get '/:id/profile', to: 'user#show'
       match '/profile', to: 'user#update', via: :patch
       get '/current', to: 'user#current'
-    end
-
-    resources :context_text, only: [ :create, :show, :update, :destroy]
-    scope '/context_text' do
-      get '/list', to: 'context_text#list'
-      get '/list/user', to: 'context_text#list_user'
-      get '/list_by_url', to: 'context_text#url_list'
     end
 
     scope '/trainings' do
