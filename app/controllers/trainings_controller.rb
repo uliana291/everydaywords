@@ -3,24 +3,28 @@ class TrainingsController < ApiController
   require 'json'
 
   def add
-    training = Training.new
-    training.kind = 'daily'
-    training.state = 'new'
-    training.user = current_user
-    if params[:json_data]
-      training.json_data = params[:json_data].to_json
-      training.save
-    else
-      if !manual_json(training)
-        training = nil
-      else
+    if current_user.user_translations.length > 0
+      training = Training.new
+      training.kind = 'daily'
+      training.state = 'new'
+      training.user = current_user
+      if params[:json_data]
+        training.json_data = params[:json_data].to_json
         training.save
+      else
+        if !manual_json(training)
+          training = nil
+        else
+          training.save
+        end
       end
-    end
-    if !training
-      render :json => {:error => 'internal-server-error'}, :status => 500
+      if !training
+        render :json => {:error => 'internal-server-error'}, :status => 500
+      else
+        render :json => {:result => {'status' => 'ok', 'id' => training.id}}, :status => 200
+      end
     else
-      render :json => {:result => {'status' => 'ok', 'id' => training.id}}, :status => 200
+      render :json => {:error => '0 words'}, :status => 500
     end
   end
 
