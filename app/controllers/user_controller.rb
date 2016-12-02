@@ -27,6 +27,8 @@ class UserController < ApiController
       user.languages.each do |l|
        languages.push({:id => l.id})
       end
+      user_attributes[:finished_words] = user.user_translations.where(learning_stage: 'finished').count
+      user_attributes[:streak] = user_streak(user)
       user_attributes[:languages] = languages
       render :json => user_attributes
     end
@@ -55,6 +57,32 @@ class UserController < ApiController
   def user_params
     params.permit(:name, :email, :about,
                   :age, :about, :min_starts, :day_words)
+  end
+
+
+  def user_streak(user)
+    trainings = user.trainings.where(state: 'finished').order('created_at DESC')
+    dates = trainings.map(&:created_at)
+    dates.uniq!
+    if !dates.nil?
+    max = 1
+    today = Date.today
+    dates.each do |date|
+      if date.to_date == today
+        max = 1
+      elsif (date.to_date == today - max)
+        max = max + 1
+      elsif (max > 1)
+        break
+      end
+    end
+    if (dates.first.to_date < (today - 1))
+      max = 0
+    end
+    else
+      max = 0
+    end
+    max
   end
 
 end

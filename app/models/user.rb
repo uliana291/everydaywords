@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
   has_many :translation_in_context_texts
   has_and_belongs_to_many :languages, join_table: :languages_users
   has_many :translations, through: :user_translations
+  has_many :trainings
 
   def self.new_with_session(params,session)
     if session["devise.user_attributes"]
@@ -30,6 +31,7 @@ class User < ActiveRecord::Base
         user.password = Devise.friendly_token[0,10]
         user.name = auth.info.name
         user.email = auth.info.email
+        user.singed_via = auth.provider
         user.save
       end
       resttoken.user_id = user.id
