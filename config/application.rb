@@ -32,6 +32,8 @@ module Everydaywords
    #
    #  config.exceptions_app = self.routes
 
+    config.autoload_paths += %W(#{config.root}/lib)
+
     require "dotenv"
     Dotenv.load(".env")
 

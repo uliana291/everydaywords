@@ -1,0 +1,2 @@
+module QaGroupsHelper
+end

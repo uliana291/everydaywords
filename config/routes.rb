@@ -26,13 +26,25 @@ Rails.application.routes.draw do
     end
 
     scope '/trainings' do
-      match '/daily', to: 'trainings#add', via: :post
+      match '/daily', to: 'trainings#add_daily', via: :post
       get '/daily/list', to: 'trainings#list'
       get '/daily/:id', to: 'trainings#get'
       match '/daily/:id', to: 'trainings#destroy', via: :delete
       get '/daily/:id/finish', to: 'trainings#finish_daily'
+      get '/:id/finish', to: 'trainings#finish_qa'
       match '/daily/:id', to: 'trainings#update', via: :patch
+      match '/:id', to: 'trainings#update', via: :patch
       get '/get', to: 'translation#list_translations'
+
+      scope '/qa' do
+        get '/:group_name/:id', to: 'trainings#get'
+        match '/:group_name', to: 'trainings#add_qa', via: :post
+        get '/:group_name/list', to: 'trainings#list'
+      end
+    end
+
+    scope '/qa_groups' do
+      get 'list', to: 'qa_groups#list'
     end
 
     get '/language/list', to: 'language#list'

@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :languages, join_table: :languages_users
   has_many :translations, through: :user_translations
   has_many :trainings
+  has_many :user_qas
 
   def self.new_with_session(params,session)
     if session["devise.user_attributes"]

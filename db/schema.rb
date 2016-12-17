@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161106123520) do
+ActiveRecord::Schema.define(version: 20161213095447) do
 
   create_table "context_texts", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -49,6 +49,24 @@ ActiveRecord::Schema.define(version: 20161106123520) do
 
   add_index "languages_users", ["language_id"], name: "index_languages_users_on_language_id", using: :btree
   add_index "languages_users", ["user_id"], name: "index_languages_users_on_user_id", using: :btree
+
+  create_table "qa_groups", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.text     "question_template", limit: 65535
+    t.text     "answer_template",   limit: 65535
+    t.string   "display_name",      limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  create_table "qas", force: :cascade do |t|
+    t.text     "json_data",   limit: 65535
+    t.integer  "qa_group_id", limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "qas", ["qa_group_id"], name: "index_qas_on_qa_group_id", using: :btree
 
   create_table "rest_access_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -116,6 +134,19 @@ ActiveRecord::Schema.define(version: 20161106123520) do
   add_index "translations", ["original_id"], name: "index_translations_on_original_id", using: :btree
   add_index "translations", ["translated_one_id"], name: "index_translations_on_translated_one_id", using: :btree
 
+  create_table "user_qas", force: :cascade do |t|
+    t.integer  "user_id",          limit: 4
+    t.integer  "qa_id",            limit: 4
+    t.string   "learning_stage",   limit: 255
+    t.datetime "next_training_at"
+    t.string   "training_history", limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "user_qas", ["qa_id"], name: "index_user_qas_on_qa_id", using: :btree
+  add_index "user_qas", ["user_id"], name: "index_user_qas_on_user_id", using: :btree
+
   create_table "user_translations", force: :cascade do |t|
     t.integer  "user_id",          limit: 4
     t.integer  "translation_id",   limit: 4
@@ -167,6 +198,7 @@ ActiveRecord::Schema.define(version: 20161106123520) do
   add_foreign_key "language_context_texts", "languages"
   add_foreign_key "languages_users", "languages"
   add_foreign_key "languages_users", "users"
+  add_foreign_key "qas", "qa_groups"
   add_foreign_key "rest_access_tokens", "users"
   add_foreign_key "text_element_context_texts", "context_texts"
   add_foreign_key "text_element_context_texts", "text_elements"
@@ -177,6 +209,8 @@ ActiveRecord::Schema.define(version: 20161106123520) do
   add_foreign_key "translation_in_context_texts", "users"
   add_foreign_key "translations", "text_elements", column: "original_id"
   add_foreign_key "translations", "text_elements", column: "translated_one_id"
+  add_foreign_key "user_qas", "qas"
+  add_foreign_key "user_qas", "users"
   add_foreign_key "user_translations", "translations"
   add_foreign_key "user_translations", "users"
 end

@@ -83,7 +83,7 @@ class TranslationController < ApiController
 
   def translation_loop(uTranslations)
     fullTranslations = []
-    unfinished_words = search_for_unfinished_words
+    unfinished_words = search_for_unfinished_words('user')
     uTranslations.each do |uTranslation|
       t = uTranslation.translation
       elOriginal = TextElement.find_by(id: t.original_id)
