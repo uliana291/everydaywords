@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161213095447) do
+ActiveRecord::Schema.define(version: 20161218102203) do
 
   create_table "context_texts", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -139,9 +139,9 @@ ActiveRecord::Schema.define(version: 20161213095447) do
     t.integer  "qa_id",            limit: 4
     t.string   "learning_stage",   limit: 255
     t.datetime "next_training_at"
-    t.string   "training_history", limit: 255
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.text     "training_history", limit: 65535
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
   end
 
   add_index "user_qas", ["qa_id"], name: "index_user_qas_on_qa_id", using: :btree

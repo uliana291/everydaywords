@@ -88,7 +88,8 @@ class TrainingsController < ApiController
       if !params[:get_qa].nil?
         qa_list = []
         json_data['user_q_a_list'].each do |el|
-          qa = Qa.find(el)
+          user_qa = UserQa.find(el)
+          qa = user_qa.qa
           qa_attr = qa.attributes.slice('id', 'json_data')
           qa_attr['json_data'] = JSON.parse(qa_attr['json_data'])
           qa_list.push(qa_attr)
@@ -202,14 +203,20 @@ class TrainingsController < ApiController
         d = Date.today
         user_qa_list = []
         q_a_random.each do |q_a|
-          user_qa = UserQa.new
-          user_qa.qa = Qa.find(q_a)
-          user_qa.user = current_user
-          user_qa.learning_stage = '1'
-          user_qa.next_training_at = (d+1).to_s
-          user_qa.training_history = [{when: d.to_s, next_stage: '1'}].to_json
-          if !user_qa.save
-            return nil
+          qa = Qa.find(q_a)
+          user_where_qa = UserQa.all.where(qa: qa)
+          if user_where_qa.length > 0
+            user_qa = user_where_qa.first
+          else
+            user_qa = UserQa.new
+            user_qa.qa = qa
+            user_qa.user = current_user
+            user_qa.learning_stage = '1'
+            user_qa.next_training_at = (d+1).to_s
+            user_qa.training_history = [{when: d.to_s, next_stage: '1'}].to_json
+            if !user_qa.save
+              return nil
+            end
           end
           user_qa_list.push(user_qa.id)
         end
