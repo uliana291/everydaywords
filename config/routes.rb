@@ -37,9 +37,9 @@ Rails.application.routes.draw do
       get '/get', to: 'translation#list_translations'
 
       scope '/qa' do
+        get '/:group_name/list', to: 'trainings#list'
         get '/:group_name/:id', to: 'trainings#get'
         match '/:group_name', to: 'trainings#add_qa', via: :post
-        get '/:group_name/list', to: 'trainings#list'
       end
     end
 
