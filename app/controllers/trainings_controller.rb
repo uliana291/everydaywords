@@ -92,6 +92,7 @@ class TrainingsController < ApiController
           qa = user_qa.qa
           qa_attr = qa.attributes.slice('id', 'json_data')
           qa_attr['json_data'] = JSON.parse(qa_attr['json_data'])
+          qa_attr['user_qa_id'] = user_qa.id
           qa_list.push(qa_attr)
         end
         trainingEl['qa_list'] = qa_list
@@ -248,14 +249,14 @@ class TrainingsController < ApiController
         if lastTrainDate
           training_history.flatten!
           tId = {}
-          attr = (type.equal?('qa') ? 'user_q_a_id' : 'user_translation_id')
+          attr = (type.eql?('qa') ? 'user_q_a_id' : 'user_translation_id')
           training_history.each do |h|
             tId[h[attr]] ||= []
             tId[h[attr]] << h['answer']
           end
           json_data['training_results'] = []
           tId.each do |item, results|
-            element = (type.equal?('qa') ? UserQa.find(item) : UserTranslation.find(item))
+            element = (type.eql?('qa') ? UserQa.find(item) : UserTranslation.find(item))
             training_count = results.length
             training_passed = 0
             results.each do |r|
