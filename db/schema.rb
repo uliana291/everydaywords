@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161218102203) do
+ActiveRecord::Schema.define(version: 20170822083615) do
 
   create_table "context_texts", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -26,6 +26,14 @@ ActiveRecord::Schema.define(version: 20161218102203) do
 
   add_index "context_texts", ["language_id"], name: "index_context_texts_on_language_id", using: :btree
   add_index "context_texts", ["user_id"], name: "index_context_texts_on_user_id", using: :btree
+
+  create_table "frequencies", force: :cascade do |t|
+    t.string   "word",       limit: 255
+    t.float    "frequency",  limit: 24
+    t.integer  "language",   limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "language_context_texts", force: :cascade do |t|
     t.integer "language_id",     limit: 4
