@@ -215,7 +215,7 @@ class TrainingsController < ApiController
         frequent_words.append({id: us_tr, freq: f.frequency})
       end
     end
-    frequent_words.sort_by! { |hsh| hsh[:freq] }
+    frequent_words.sort_by! { |hsh| hsh[:freq] }.reverse!
     frequent_words_ids = frequent_words.map { |word| word[:id]}
     result += frequent_words_ids.first(remained)
     return result
