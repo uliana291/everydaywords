@@ -196,23 +196,24 @@ class TrainingsController < ApiController
     almost_finished = user_translations.where(learning_stage: '30').order(:updated_at).limit((remained * 0.3).to_int)
     result += almost_finished.pluck(:id)
     remained -= result.count
-    user_translations.where.not(id: result).each do |us_tr|
-      if us_tr.translation.original.value.include? ' '
-        result.append(us_tr.id)
+    frequent_words = []
+    user_translation_ids = user_translations.ids
+    translations = Translation.all.includes(:user_translations).where(user_translations: {id: user_translation_ids})
+            .includes(:original).order('user_translations.updated_at')
+    translations.each do |t|
+      if t.original.value.include? ' ' and expressions > 0
+        result.append(t.user_translations.first.id)
         remained -= 1
         expressions -= 1
-        if expressions == 0
-          break
-        end
-      end
-    end
-    frequent_words = []
-    user_translations.where.not(id: result).order(:updated_at).each do |us_tr|
-      f = Frequency.find_by(word: us_tr.translation.original.value)
-      if f == nil
-        frequent_words.append({id: us_tr.id, freq: -1})
       else
-        frequent_words.append({id: us_tr, freq: f.frequency})
+        f = Frequency.find_by(word: t.original.value)
+        if f and f.frequency > 0
+          if f == nil
+            frequent_words.append({id: t.user_translations.first.id, freq: -1})
+          else
+            frequent_words.append({id: t.user_translations.first.id, freq: f.frequency})
+          end
+        end
       end
     end
     frequent_words.sort_by! { |hsh| hsh[:freq] }.reverse!
@@ -226,8 +227,8 @@ class TrainingsController < ApiController
     if current_user.day_words != nil
       if qa.nil?
         unfinished_words = search_for_unfinished_words('user')
-        user_translations = current_user.user_translations.where('next_training_at<= ?', Date.today)
-                                .where.not(id: unfinished_words)
+        user_translations = current_user.user_translations
+                                .where.not(id: unfinished_words).where.not(learning_stage: 'finished')
         if user_translations.count <= current_user.day_words
           ut_list = user_translations.pluck(:id).sample(current_user.day_words)
         else
