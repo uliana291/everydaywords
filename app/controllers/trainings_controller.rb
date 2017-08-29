@@ -199,7 +199,7 @@ class TrainingsController < ApiController
     frequent_words = []
     user_translation_ids = user_translations.ids
     translations = Translation.all.includes(:user_translations).where(user_translations: {id: user_translation_ids})
-            .includes(:original).order('user_translations.updated_at')
+                       .where.not(user_translations: {id: result}).includes(:original).order('user_translations.updated_at')
     translations.each do |t|
       if t.original.value.include? ' ' and expressions > 0
         result.append(t.user_translations.first.id)
@@ -213,9 +213,13 @@ class TrainingsController < ApiController
           else
             frequent_words.append({id: t.user_translations.first.id, freq: f.frequency})
           end
+          if frequent_words.count > 100
+            break
+          end
         end
       end
     end
+    frequent_words.uniq!
     frequent_words.sort_by! { |hsh| hsh[:freq] }.reverse!
     frequent_words_ids = frequent_words.map { |word| word[:id]}
     result += frequent_words_ids.first(remained)
