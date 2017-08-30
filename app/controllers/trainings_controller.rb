@@ -85,7 +85,22 @@ class TrainingsController < ApiController
                     'kind' => training.kind,
                     'user_id' => training.user_id,
                     'json_data' => json_data}
-      if !params[:get_qa].nil?
+      if params[:get_qa].nil?
+        user_translation_id_list = json_data['user_translation_id_list']
+        translations = Translation.includes(:user_translations).where(user_translations: {id: user_translation_id_list}).includes(:original).includes(:translated_one).includes(:context_texts)
+        prepared_data = []
+        translations.each do |t|
+          context_texts = []
+          t.context_texts.each do |ct|
+            context_texts << ct.whole_text
+          end
+          prepared_data << { 'user_translation_id' => t.user_translations.first.id,
+                             'original' => t.original.value,
+                             'translated_one' => t.translated_one.value,
+                             'context_texts' => context_texts}
+          trainingEl['prepared_data'] = prepared_data
+        end
+      else
         qa_list = []
         json_data['user_q_a_list'].each do |el|
           user_qa = UserQa.find(el)
