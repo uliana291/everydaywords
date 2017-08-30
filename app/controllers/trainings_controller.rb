@@ -87,12 +87,15 @@ class TrainingsController < ApiController
                     'json_data' => json_data}
       if params[:get_qa].nil?
         user_translation_id_list = json_data['user_translation_id_list']
-        translations = Translation.includes(:user_translations).where(user_translations: {id: user_translation_id_list}).includes(:original).includes(:translated_one).includes(:context_texts)
+        translations = Translation.includes(:user_translations).where(user_translations: {id: user_translation_id_list})
+                           .includes(:original).includes(:translated_one).includes(:context_texts).includes(:translation_in_context_texts)
         prepared_data = []
         translations.each do |t|
           context_texts = []
-          t.context_texts.each do |ct|
-            context_texts << ct.whole_text
+          t.translation_in_context_texts.each do |ct|
+            context_texts.append({'position' => ct.position,
+                                  'selection_length' => ct.selection_length,
+                                  'whole_text' => ct.context_text.whole_text})
           end
           prepared_data << { 'user_translation_id' => t.user_translations.first.id,
                              'original' => t.original.value,
