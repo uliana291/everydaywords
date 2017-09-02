@@ -251,6 +251,7 @@ class TrainingsController < ApiController
         unfinished_words = search_for_unfinished_words('user')
         user_translations = current_user.user_translations
                                 .where.not(id: unfinished_words).where.not(learning_stage: 'finished')
+                                .where('next_training_at <= ?', Time.now)
         if user_translations.count <= current_user.day_words
           ut_list = user_translations.pluck(:id).sample(current_user.day_words)
         else
