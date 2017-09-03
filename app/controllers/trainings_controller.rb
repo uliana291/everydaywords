@@ -62,7 +62,7 @@ class TrainingsController < ApiController
 
 
   def list
-    trainings = Training.select(id, state, json_data).where(:kind => (params[:group_name].nil? ? 'daily' : params[:group_name]),
+    trainings = Training.select("id, state, json_data").where(:kind => (params[:group_name].nil? ? 'daily' : params[:group_name]),
                                :user_id => current_user.id).sort_by(&:created_at).reverse
     trainingsArr = []
     trainings.each do |t|
@@ -73,7 +73,6 @@ class TrainingsController < ApiController
                         'passed' => json_data['training_history'].length)
     end
     render :json => trainingsArr
-
   end
 
   def get
