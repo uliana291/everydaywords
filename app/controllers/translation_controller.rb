@@ -2,15 +2,7 @@ class TranslationController < ApiController
   include TranslationHelper
 
   def list_user
-    uTranslations = current_user.user_translations
-    fullTranslation = translation_loop(uTranslations)
-    render(json: fullTranslation)
-  end
-
-
-  def list_translations
-    uTranslations = current_user.user_translations.where('next_training_at<= ?', Date.today)
-    fullTranslation = translation_loop(uTranslations)
+    fullTranslation = translation_loop
     render(json: fullTranslation)
   end
 
@@ -81,7 +73,28 @@ class TranslationController < ApiController
   private
 
 
-  def translation_loop(uTranslations)
+  def translation_loop
+    unfinished_words = search_for_unfinished_words('user')
+    full_translations = []
+    translations = Translation.includes(:user_translations).where(user_translations: {user_id: current_user.id})
+                       .includes(:original).includes(:translated_one)
+    translations.each do |tr|
+      already_training = unfinished_words.include?(tr.user_translations.first.id)
+      full_translations.push('original' => tr.original.value,
+                             'learning_stage' => tr.user_translations.first.learning_stage,
+                             'next_training_at' => tr.user_translations.first.next_training_at,
+                             'already_training' => already_training,
+                             'lang_from_id' => tr.original.language_id,
+                             'lang_to_id' => tr.translated_one.language_id,
+                             'user_translation_id' => tr.user_translations.first.id,
+                             'translated_one' => tr.translated_one.value)
+    end
+    full_translations
+  end
+
+=begin
+  def translation_loop
+    uTranslations = current_user.user_translations
     fullTranslations = []
     unfinished_words = search_for_unfinished_words('user')
     uTranslations.each do |uTranslation|
@@ -127,6 +140,7 @@ class TranslationController < ApiController
     end
     fullTranslations
   end
+=end
 
 
 end

@@ -34,7 +34,6 @@ Rails.application.routes.draw do
       get '/:id/finish', to: 'trainings#finish_qa'
       match '/daily/:id', to: 'trainings#update', via: :patch
       match '/:id', to: 'trainings#update', via: :patch
-      get '/get', to: 'translation#list_translations'
 
       scope '/qa' do
         get '/:group_name/list', to: 'trainings#list'

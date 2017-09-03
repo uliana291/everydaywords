@@ -62,13 +62,15 @@ class TrainingsController < ApiController
 
 
   def list
-    trainings = Training.where(:kind => (params[:group_name].nil? ? 'daily' : params[:group_name]),
+    trainings = Training.select(id, state, json_data).where(:kind => (params[:group_name].nil? ? 'daily' : params[:group_name]),
                                :user_id => current_user.id).sort_by(&:created_at).reverse
     trainingsArr = []
     trainings.each do |t|
+      json_data = JSON.parse(t.json_data)
       trainingsArr.push('id' => t.id,
                         'state' => t.state,
-                        'json_data' => JSON.parse(t.json_data))
+                        'name' => json_data['name'],
+                        'passed' => json_data['training_history'].length)
     end
     render :json => trainingsArr
 
@@ -83,8 +85,7 @@ class TrainingsController < ApiController
       trainingEl = {'id' => training.id,
                     'state' => training.state,
                     'kind' => training.kind,
-                    'user_id' => training.user_id,
-                    'json_data' => json_data}
+                    'user_id' => training.user_id}
       if params[:get_qa].nil?
         user_translation_id_list = json_data['user_translation_id_list']
         translations = Translation.includes(:user_translations).where(user_translations: {id: user_translation_id_list})
