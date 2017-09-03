@@ -84,7 +84,8 @@ class TrainingsController < ApiController
       trainingEl = {'id' => training.id,
                     'state' => training.state,
                     'kind' => training.kind,
-                    'user_id' => training.user_id}
+                    'user_id' => training.user_id,
+                    'json_data' => json_data}
       if params[:get_qa].nil?
         user_translation_id_list = json_data['user_translation_id_list']
         translations = Translation.includes(:user_translations).where(user_translations: {id: user_translation_id_list})
