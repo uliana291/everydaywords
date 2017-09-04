@@ -67,10 +67,11 @@ class TrainingsController < ApiController
     trainingsArr = []
     trainings.each do |t|
       json_data = JSON.parse(t.json_data)
+      passed = (json_data['training_history'].nil? ? 0 : json_data['training_history'].length)
       trainingsArr.push('id' => t.id,
                         'state' => t.state,
                         'name' => json_data['name'],
-                        'passed' => json_data['training_history'].length)
+                        'passed' => passed)
     end
     render :json => trainingsArr
   end
