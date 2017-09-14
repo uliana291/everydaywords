@@ -265,7 +265,8 @@ class TrainingsController < ApiController
       else
         group = QaGroup.where(name: params[:group_name]).first()
         unfinished_qa = search_for_unfinished_words('q_a')
-        q_a_random = Qa.all.where(qa_group: group).where.not(id: unfinished_qa).pluck(:id).sample(current_user.day_words)
+        q_a_random = Qa.includes(:user_qas).where(qa_group: group).where.not(id: unfinished_qa)
+                         .where('user_qas.next_training_at <= ?',  Time.now).pluck(:id).sample(current_user.day_words)
         d = Date.today
         user_qa_list = []
         q_a_random.each do |q_a|
