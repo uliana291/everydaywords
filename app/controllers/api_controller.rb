@@ -1,6 +1,7 @@
 class ApiController < ActionController::Metal
   abstract!
   require 'fileutils'
+  require 'json'
 
   include AbstractController::Callbacks
   include ActionController::RackDelegation
@@ -31,6 +32,48 @@ class ApiController < ActionController::Metal
   def ping
     render :json => {:result => { 'response' => 'pong' }}, :status => 200
   end
+
+  def proxy_request
+    if !current_user
+      return api_error(status: 403, errors: 'Not authorized')  
+    end
+
+    url = URI.parse(params[:url])
+    if params[:method] == 'GET'
+      req = Net::HTTP::Get.new(url.to_s)
+    elsif params[:method] == 'POST'  
+      req = Net::HTTP::Post.new(url.to_s)
+      if not params[:body].nil?
+        req.body = params[:body]  
+      end    
+    end 
+    if not params[:headers].nil? 
+      params[:headers].each do |header|
+        if !header.nil?
+          req[header[:name]] = header[:value]
+        end  
+      end    
+    end
+
+    http = Net::HTTP.new(url.host, url.port)
+    if url.scheme == 'https'
+      http.use_ssl = true  
+    end    
+
+    res = http.request(req)
+    puts res.body
+    puts res.body.encoding
+    res_body = res.body
+
+    if params[:url].include? "multitran"
+        res_body = res_body.force_encoding("cp1251").encode("utf-8")
+    end    
+
+    render :json => {:result => { 
+      'body' => res_body,
+      'code' => res.code
+    }}, :status => 200  
+  end    
 
   private
 
