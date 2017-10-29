@@ -1,18 +1,22 @@
 class UserController < ApiController
 
   def current
-    render(json: current_user)
+    if !current_user and ENV.fetch('DEV_ALLOW_GUEST_LOGIN', '0') == '1'
+      render(json: {:id => -1,:name => "dev", :email => "dev@local.local", :admin => true})  
+    else  
+      render(json: current_user)
+    end  
   end
 
   def list
-    if current_user.admin?
+    if not current_user.nil? and current_user.admin? or ENV.fetch('DEV_ALLOW_GUEST_LOGIN', '0') == '1'
       users = User.all
       render(json: users)
     end
   end
 
   def become
-    return unless current_user.admin?
+    return unless not current_user.nil? and current_user.admin? or ENV.fetch('DEV_ALLOW_GUEST_LOGIN', '0') == '1' 
     sign_in(:user, User.find(params[:id]))
     render(json: current_user)
   end
