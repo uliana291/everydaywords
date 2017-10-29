@@ -54,6 +54,8 @@ Rails.application.routes.draw do
     match '/add_translation', to: 'translation#add', via: :post
 
     get '/ping', to: 'api#ping'
+    match '/proxy_request', to: 'api#proxy_request', via: :post
+
   end
 
   get '/login' => 'welcome#index'
