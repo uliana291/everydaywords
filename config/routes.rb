@@ -16,12 +16,14 @@ Rails.application.routes.draw do
     get '/context_text/list/user', to: 'context_text#list_user'
     get '/context_text/list_by_url', to: 'context_text#url_list'
     resources :context_text, only: [ :create, :show, :update, :destroy]
+
     scope '/user' do
       get '/list', to: 'user#list'
       get '/switch/:id', to: 'user#become'
       get '/profile/', to: 'user#show'
       get '/:id/profile', to: 'user#show'
       match '/profile', to: 'user#update', via: :patch
+      match '/restore_session', to: 'user#restore_session', via: :post
       get '/current', to: 'user#current'
     end
 
