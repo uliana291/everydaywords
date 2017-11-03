@@ -24,7 +24,12 @@ class User < ActiveRecord::Base
   end
 
   def self.from_omniauth(auth, current_user)
-    resttoken= RestAccessToken.where(:provider => auth.provider, :uid => auth.uid.to_s, :token => auth.credentials.token, :secret => auth.credentials.secret).first_or_initialize
+    resttoken= RestAccessToken.where(
+        :provider => auth.provider,
+        :uid => auth.uid.to_s,
+        :token => auth.credentials.token,
+        :secret => auth.credentials.secret
+    ).first_or_initialize
     if resttoken.user.blank?
       user = current_user || User.where('email = ?', auth["info"]["email"]).first
       if user.blank?

@@ -1,11 +1,26 @@
+require "active_support/core_ext/hash/keys"
+require "action_dispatch/middleware/session/abstract_store"
+require "rack/session/cookie"
+
 class UserController < ApiController
 
   def current
     if !current_user and ENV.fetch('DEV_ALLOW_GUEST_LOGIN', '0') == '1'
-      render(json: {:id => -1,:name => "dev", :email => "dev@local.local", :admin => true})  
-    else  
-      render(json: current_user)
+      render(json: {:id => -1,:name => "dev", :email => "dev@local.local", :admin => true})
+    else
+      response = current_user.as_json
+      response[:session_id] = request.cookie_jar['_everydaywords_session']
+      render(json: response)
     end  
+  end
+
+  def restore_session
+    request.cookie_jar['_everydaywords_session'] = params[:saved_session_id]
+    data = request.cookie_jar.signed_or_encrypted['_everydaywords_session']
+    user_id = data["warden.user.user.key"][0][0]
+    puts "restoring session for #{user_id}"
+    sign_in(:user, User.find(user_id))
+    render(json: current_user)
   end
 
   def list
