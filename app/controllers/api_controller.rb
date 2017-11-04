@@ -55,7 +55,11 @@ class ApiController < ActionController::Metal
       end    
     end
 
-    http = Net::HTTP.new(url.host, url.port)
+    if ENV.fetch('PROXY_HOST', '0') == '0'
+      http = Net::HTTP.new(url.host, url.port)
+    else
+      http = Net::HTTP.new(url.host, url.port, ENV.fetch('PROXY_HOST'), Integer(ENV.fetch('PROXY_PORT')))
+    end
     if url.scheme == 'https'
       http.use_ssl = true  
     end    
