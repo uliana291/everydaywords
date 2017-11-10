@@ -227,15 +227,13 @@ class TrainingsController < ApiController
         expressions -= 1
       else
         f = Frequency.find_by(word: t.original.value)
-        if f and f.frequency > 0
-          if f == nil
-            frequent_words.append({id: t.user_translations.first.id, freq: -1})
-          else
-            frequent_words.append({id: t.user_translations.first.id, freq: f.frequency})
-          end
-          if frequent_words.count > 100
-            break
-          end
+        if f == nil
+          frequent_words.append({id: t.user_translations.first.id, freq: -1})
+        else
+          frequent_words.append({id: t.user_translations.first.id, freq: f.frequency})
+        end
+        if frequent_words.count > 100
+          break
         end
       end
     end
